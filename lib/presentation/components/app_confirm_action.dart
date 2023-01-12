@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 // ignore: no_logic_in_create_state
-class ConfirmActionWidget extends StatefulWidget {
+class ConfirmActionWidget extends StatelessWidget {
   final String? title;
   final String message;
   final String? confirmButtonText;
@@ -16,30 +16,24 @@ class ConfirmActionWidget extends StatefulWidget {
       : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
-  _ConfirmActionWidgetState createState() => _ConfirmActionWidgetState();
-}
-
-class _ConfirmActionWidgetState extends State<ConfirmActionWidget> {
-  @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: widget.title == null ? null : Text(widget.title!),
-      content: Text(widget.message),
+      title: title == null ? null : Text(title!),
+      content: Text(message),
       actions: [
         TextButton(
           onPressed: () {
             Navigator.of(context).pop(false);
           },
-          child: Text(widget.cancelButtonText),
+          child: Text(cancelButtonText),
         ),
-        widget.confirmButtonText == null
+        confirmButtonText == null
             ? SizedBox.shrink()
             : ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pop(true);
                 },
-                child: Text(widget.confirmButtonText!),
+                child: Text(confirmButtonText!),
               )
       ],
     );

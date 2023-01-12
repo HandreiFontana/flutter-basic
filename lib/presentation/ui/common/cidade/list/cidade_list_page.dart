@@ -18,58 +18,72 @@ class _CidadeListPageState extends State<CidadeListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return AppScaffold(
+    return WillPopScope(
+      onWillPop: () async {
+        bool retorno = true;
+
+        Navigator.of(context).pushReplacementNamed('/home');
+
+        return retorno;
+      },
+      child: AppScaffold(
         title: Text('Cidades'),
         body: Center(
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            AppSearchBar(
-              onSearch: (q) {
-                setState(() {
-                  query = q;
-                });
-              },
-            ),
-            Expanded(
-                child: SizedBox(
-              child: FutureBuilder(
-                future: Provider.of<CidadeRepository>(context, listen: false).list(query, 50, 0, ['ASC', 'ASC']),
-                builder: ((context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.error != null) {
-                    return AppNoData();
-                  } else {
-                    Map<String, dynamic> snapshotData = snapshot.data as Map<String, dynamic>;
-                    if (snapshotData['items'].isNotEmpty) {
-                      return Consumer<CidadeRepository>(
-                        builder: (ctx, cidades, child) => RefreshIndicator(
-                          onRefresh: (() {
-                            return Future.delayed(
-                              Duration(microseconds: 2),
-                              (() {
-                                setState(() {});
-                              }),
-                            );
-                          }),
-                          child: ListView.builder(
-                            itemCount: cidades.itemsCount,
-                            itemBuilder: (ctx, i) =>
-                                CidadeListWidget(cidades.items[i]),
-                            physics: const AlwaysScrollableScrollPhysics(),
-                          ),
-
-                        ),
-                      );
-                    } else {
-                      return AppNoData();
-                    }
-                  }
-                }),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              AppSearchBar(
+                onSearch: (q) {
+                  setState(() {
+                    query = q;
+                  });
+                },
               ),
-            )),
-          ],
-        )));
+              Expanded(
+                child: SizedBox(
+                  child: FutureBuilder(
+                    future:
+                        Provider.of<CidadeRepository>(context, listen: false)
+                            .list(query, 50, 0, ['ASC', 'ASC']),
+                    builder: ((context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.error != null) {
+                        return AppNoData();
+                      } else {
+                        Map<String, dynamic> snapshotData =
+                            snapshot.data as Map<String, dynamic>;
+                        if (snapshotData['items'].isNotEmpty) {
+                          return Consumer<CidadeRepository>(
+                            builder: (ctx, cidades, child) => RefreshIndicator(
+                              onRefresh: (() {
+                                return Future.delayed(
+                                  Duration(microseconds: 2),
+                                  (() {
+                                    setState(() {});
+                                  }),
+                                );
+                              }),
+                              child: ListView.builder(
+                                itemCount: cidades.itemsCount,
+                                itemBuilder: (ctx, i) =>
+                                    CidadeListWidget(cidades.items[i]),
+                                physics: const AlwaysScrollableScrollPhysics(),
+                              ),
+                            ),
+                          );
+                        } else {
+                          return AppNoData();
+                        }
+                      }
+                    }),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
