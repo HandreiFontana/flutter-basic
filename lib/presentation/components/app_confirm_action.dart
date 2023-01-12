@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 // ignore: no_logic_in_create_state
 class ConfirmActionWidget extends StatefulWidget {
-  final String title;
+  final String? title;
   final String message;
   final String? confirmButtonText;
   final String cancelButtonText;
@@ -10,7 +10,7 @@ class ConfirmActionWidget extends StatefulWidget {
   const ConfirmActionWidget(
       {Key? key,
       this.confirmButtonText,
-      required this.title,
+      this.title,
       required this.message,
       required this.cancelButtonText})
       : super(key: key);
@@ -24,7 +24,7 @@ class _ConfirmActionWidgetState extends State<ConfirmActionWidget> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.title),
+      title: widget.title == null ? null : Text(widget.title!),
       content: Text(widget.message),
       actions: [
         TextButton(
