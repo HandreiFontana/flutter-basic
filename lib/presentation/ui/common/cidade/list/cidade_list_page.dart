@@ -34,22 +34,19 @@ class _CidadeListPageState extends State<CidadeListPage> {
             Expanded(
                 child: SizedBox(
               child: FutureBuilder(
-                future: Provider.of<CidadeRepository>(context, listen: false)
-                    .list(query, 50, 0, ['ASC', 'ASC']),
+                future: Provider.of<CidadeRepository>(context, listen: false).list(query, 50, 0, ['ASC', 'ASC']),
                 builder: ((context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.error != null) {
                     return AppNoData();
                   } else {
-                    Map<String, dynamic> snapshotData =
-                        snapshot.data as Map<String, dynamic>;
+                    Map<String, dynamic> snapshotData = snapshot.data as Map<String, dynamic>;
                     if (snapshotData['items'].isNotEmpty) {
                       return Consumer<CidadeRepository>(
                         builder: (ctx, cidades, child) => ListView.builder(
                           itemCount: cidades.itemsCount,
-                          itemBuilder: (ctx, i) =>
-                              CidadeListWidget(cidades.items[i]),
+                          itemBuilder: (ctx, i) => CidadeListWidget(cidades.items[i]),
                         ),
                       );
                     } else {

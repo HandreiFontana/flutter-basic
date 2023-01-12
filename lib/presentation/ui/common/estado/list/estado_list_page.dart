@@ -20,6 +20,7 @@ class _EstadoListPageState extends State<EstadoListPage> {
   Widget build(BuildContext context) {
     return AppScaffold(
         title: Text('Estados'),
+        route: '/estados-form',
         body: Center(
             child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -34,22 +35,19 @@ class _EstadoListPageState extends State<EstadoListPage> {
             Expanded(
                 child: SizedBox(
               child: FutureBuilder(
-                future: Provider.of<EstadoRepository>(context, listen: false)
-                    .list(query, 50, 0, ['ASC', 'ASC']),
+                future: Provider.of<EstadoRepository>(context, listen: false).list(query, 50, 0, ['ASC', 'ASC']),
                 builder: ((context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.error != null) {
                     return AppNoData();
                   } else {
-                    Map<String, dynamic> snapshotData =
-                        snapshot.data as Map<String, dynamic>;
+                    Map<String, dynamic> snapshotData = snapshot.data as Map<String, dynamic>;
                     if (snapshotData['items'].isNotEmpty) {
                       return Consumer<EstadoRepository>(
                         builder: (ctx, estados, child) => ListView.builder(
                           itemCount: estados.itemsCount,
-                          itemBuilder: (ctx, i) =>
-                              EstadoListWidget(estados.items[i]),
+                          itemBuilder: (ctx, i) => EstadoListWidget(estados.items[i]),
                         ),
                       );
                     } else {
