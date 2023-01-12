@@ -5,6 +5,7 @@ import 'package:basic/presentation/components/app_form_button.dart';
 import 'package:basic/presentation/components/app_scaffold.dart';
 import 'package:basic/presentation/components/inputs/app_form_text_input_widget.dart';
 import 'package:basic/shared/exceptions/auth_exception.dart';
+import 'package:basic/shared/utils/arguments.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,12 +18,25 @@ class EstadoFormPage extends StatefulWidget {
 
 class _EstadoFormPageState extends State<EstadoFormPage> {
   final _formKey = GlobalKey<FormState>();
+  bool isViewPage = false;
 
   final controllers = EstadoController(
     id: TextEditingController(),
     nome: TextEditingController(),
     uf: TextEditingController(),
   );
+
+  @override
+  void initState() {
+    final args = ModalRoute.of(context)!.settings.arguments as Arguments?;
+    if (args != null) {
+      controllers.id.text = args.data['id'] ?? '';
+      _loadData(controllers.id.text);
+      isViewPage = args.data['view'] ?? false;
+    }
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +93,18 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
         Expanded(child: AppFormButton(submit: _submit, label: 'Salvar')),
       ],
     );
+  }
+
+  Future<void> _loadData(String id) async {
+    await Provider.of<EstadoRepository>(context, listen: false).get(id).then((estado) => _populateController(estado));
+  }
+
+  Future<void> _populateController(Estado estado) async {
+    setState(() {
+      controllers.id.text = estado.id ?? '';
+      controllers.nome.text = estado.nome ?? '';
+      controllers.uf.text = estado.uf ?? '';
+    });
   }
 
   Future<void> _submit() async {

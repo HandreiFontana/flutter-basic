@@ -40,7 +40,7 @@ class AppDismissible extends StatelessWidget {
           color: Colors.white,
         ),
       ),
-      confirmDismiss: (direction) {
+      confirmDismiss: (direction) async {
         String acao = '';
         switch (direction) {
           case DismissDirection.endToStart:
@@ -52,7 +52,7 @@ class AppDismissible extends StatelessWidget {
           default:
             false;
         }
-        return showDialog(
+        return await showDialog(
           context: context,
           builder: (context) {
             return ConfirmActionWidget(
