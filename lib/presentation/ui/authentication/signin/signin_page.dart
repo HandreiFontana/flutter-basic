@@ -15,6 +15,7 @@ class AuthenticationPage extends StatefulWidget {
 
 class _AuthenticationPageState extends State<AuthenticationPage> {
   final _formKey = GlobalKey<FormState>();
+  // ignore: unused_field
   bool _isLoading = false;
   final Map<String, String> _authData = {
     'login': '',
@@ -57,7 +58,8 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
         ),
         keyboardType: TextInputType.emailAddress,
         onSaved: (login) => _authData['login'] = login ?? '',
-        validator: (value) => (value ?? '').isNotEmpty ? null : 'Campo obrigatório!',
+        validator: (value) =>
+            (value ?? '').isNotEmpty ? null : 'Campo obrigatório!',
       ),
     );
   }
@@ -75,7 +77,8 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
           labelText: 'Senha',
         ),
         obscureText: true,
-        onSaved: (password) => _authData['password'] = base64.encode(utf8.encode(password ?? '')),
+        onSaved: (password) =>
+            _authData['password'] = base64.encode(utf8.encode(password ?? '')),
         validator: (passwordPar) {
           final password = passwordPar ?? '';
           if (password.isEmpty || password.length < 5) {
@@ -133,11 +136,12 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
     Authentication authentication = Provider.of(context, listen: false);
 
     try {
-      await authentication.login(
-        _authData['login']!,
-        _authData['password']!,
-      );
-      Navigator.of(context).pushReplacementNamed('/home');
+      await authentication
+          .login(
+            _authData['login']!,
+            _authData['password']!,
+          )
+          .then((value) => Navigator.of(context).pushReplacementNamed('/home'));
     } on AuthException catch (error) {
       _showErrorDialog(error.toString());
     } catch (error) {
@@ -151,9 +155,11 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
         padding: const EdgeInsets.only(top: 15),
         child: ElevatedButton(
           style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(AppColors.primary),
+            backgroundColor:
+                MaterialStateProperty.all<Color>(AppColors.primary),
             padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(20)),
-            foregroundColor: MaterialStateProperty.all<Color>(AppColors.background),
+            foregroundColor:
+                MaterialStateProperty.all<Color>(AppColors.background),
           ),
           onPressed: _submit,
           child: const SizedBox(
@@ -176,7 +182,13 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [buildFormLogo, buildFormFieldEmail, buildFormFieldPassword, buildElevatedButton(context), buildFormLogoVamilly],
+          children: [
+            buildFormLogo,
+            buildFormFieldEmail,
+            buildFormFieldPassword,
+            buildElevatedButton(context),
+            buildFormLogoVamilly
+          ],
         ),
       ),
     );

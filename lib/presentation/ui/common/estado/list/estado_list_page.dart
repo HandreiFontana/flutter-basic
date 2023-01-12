@@ -48,7 +48,8 @@ class _EstadoListPageState extends State<EstadoListPage> {
                       return Consumer<EstadoRepository>(
                         builder: (ctx, estados, child) => ListView.builder(
                           itemCount: estados.itemsCount,
-                          itemBuilder: (ctx, i) => EstadoListWidget(estados.items[i]),
+                          itemBuilder: (ctx, i) =>
+                              EstadoListWidget(estados.items[i]),
                         ),
                       );
                     } else {

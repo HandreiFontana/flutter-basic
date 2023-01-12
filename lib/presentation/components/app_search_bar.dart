@@ -14,6 +14,7 @@ class _AppSearchBarState extends State<AppSearchBar> {
   final _formKey = GlobalKey<FormState>();
 
   final _controller = TextEditingController();
+  // ignore: unused_field
   var _autoValidate = false;
 
   final _debouncer = Debouncer(milliseconds: 1000);
