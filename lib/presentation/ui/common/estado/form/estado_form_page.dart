@@ -29,7 +29,7 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [],
+            children: const [],
           ),
         ),
       ),
