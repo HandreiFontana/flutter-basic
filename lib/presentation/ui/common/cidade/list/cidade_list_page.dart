@@ -49,7 +49,7 @@ class _CidadeListPageState extends State<CidadeListPage> {
                         builder: (ctx, cidades, child) => RefreshIndicator(
                           onRefresh: (() {
                             return Future.delayed(
-                              Duration(microseconds: 500),
+                              Duration(microseconds: 2),
                               (() {
                                 setState(() {});
                               }),
@@ -59,6 +59,7 @@ class _CidadeListPageState extends State<CidadeListPage> {
                             itemCount: cidades.itemsCount,
                             itemBuilder: (ctx, i) =>
                                 CidadeListWidget(cidades.items[i]),
+                            physics: const AlwaysScrollableScrollPhysics(),
                           ),
                         ),
                       );

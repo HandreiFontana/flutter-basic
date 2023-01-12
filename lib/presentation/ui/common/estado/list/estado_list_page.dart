@@ -1,3 +1,4 @@
+import 'package:basic/presentation/components/app_confirm_action.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:basic/data/repositories/common/estado_repository.dart';
@@ -59,6 +60,7 @@ class _EstadoListPageState extends State<EstadoListPage> {
                               itemCount: estados.itemsCount,
                               itemBuilder: (ctx, i) =>
                                   EstadoListWidget(estados.items[i]),
+                              physics: const AlwaysScrollableScrollPhysics(),
                             ),
                           ),
                         );

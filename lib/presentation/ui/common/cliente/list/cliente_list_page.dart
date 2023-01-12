@@ -59,6 +59,7 @@ class _ClienteListPageState extends State<ClienteListPage> {
                               itemCount: clientes.itemsCount,
                               itemBuilder: (ctx, i) =>
                                   ClienteListWidget(clientes.items[i]),
+                              physics: const AlwaysScrollableScrollPhysics(),
                             ),
                           ),
                         );
