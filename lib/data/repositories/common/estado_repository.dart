@@ -20,6 +20,29 @@ class EstadoRepository with ChangeNotifier {
     this._estados = const [],
   ]);
 
+  // Save
+
+  Future<bool> save(
+    Map<String, String?> data,
+  ) async {
+    const url = '${AppConstants.apiUrl}/estados';
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $_token',
+      },
+      body: jsonEncode(data),
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    }
+
+    return false;
+  }
+
   // list
 
   Future<Map<String, dynamic>> list(
@@ -30,8 +53,7 @@ class EstadoRepository with ChangeNotifier {
   ) async {
     _estados.clear();
 
-    final url =
-        '${AppConstants.apiUrl}/estados?page=$page&pageSize=$rowsPerPage&search=$search';
+    final url = '${AppConstants.apiUrl}/estados?page=$page&pageSize=$rowsPerPage&search=$search';
 
     final response = await http.get(
       Uri.parse(url),
