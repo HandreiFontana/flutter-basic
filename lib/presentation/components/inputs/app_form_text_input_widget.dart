@@ -5,10 +5,9 @@ import 'package:flutter/services.dart';
 class FormTextInput extends StatefulWidget {
   const FormTextInput({
     super.key,
-    required this.campo,
     required this.label,
     required this.controller,
-    required this.onSaved,
+    this.onSaved,
     this.isVisible,
     this.isDisabled,
     this.onChanged,
@@ -18,11 +17,10 @@ class FormTextInput extends StatefulWidget {
     this.keyboardType,
   });
 
-  final String campo;
   final String label;
   final TextEditingController controller;
   final Function(String value)? onChanged;
-  final Function(String campo, String? value) onSaved;
+  final Function(String? value)? onSaved;
   final bool? isVisible;
   final bool? isDisabled;
   final bool? isRequired;
@@ -79,7 +77,7 @@ class _FormTextInputState extends State<FormTextInput> {
                     widget.onChanged!(value);
                   }
                 },
-                onSaved: (value) => widget.onSaved(widget.campo, value),
+                onSaved: widget.onSaved != null ? (value) => widget.onSaved!(value) : (value) => widget.controller.text = value ?? '',
                 controller: widget.controller,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
