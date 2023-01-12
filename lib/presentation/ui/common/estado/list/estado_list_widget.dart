@@ -1,11 +1,8 @@
 import 'package:basic/presentation/components/app_confirm_action.dart';
 import 'package:basic/presentation/components/app_list%20_dismissible_card.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:basic/shared/exceptions/http_exception.dart';
 import 'package:basic/shared/themes/app_colors.dart';
 import 'package:basic/domain/models/common/estado.dart';
-import 'package:basic/data/repositories/common/estado_repository.dart';
 
 class EstadoListWidget extends StatelessWidget {
   final Estado estado;
@@ -17,7 +14,7 @@ class EstadoListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final msg = ScaffoldMessenger.of(context);
+    //final msg = ScaffoldMessenger.of(context);
     return AppDismissible(
       endToStart: () {
         showDialog(

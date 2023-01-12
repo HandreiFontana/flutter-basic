@@ -14,7 +14,7 @@ class CidadeListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final msg = ScaffoldMessenger.of(context);
+    //final msg = ScaffoldMessenger.of(context);
     return AppDismissible(
       endToStart: () {
         showDialog(
