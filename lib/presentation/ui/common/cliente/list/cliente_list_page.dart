@@ -19,9 +19,9 @@ class _ClienteListPageState extends State<ClienteListPage> {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-        title: Text('Clientes'),
-        body: Center(
-            child: Column(
+      title: Text('Clientes'),
+      body: Center(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             AppSearchBar(
@@ -51,12 +51,39 @@ class _ClienteListPageState extends State<ClienteListPage> {
                       );
                     } else {
                       return AppNoData();
+                    } else {
+                      Map<String, dynamic> snapshotData =
+                          snapshot.data as Map<String, dynamic>;
+                      if (snapshotData['items'].isNotEmpty) {
+                        return Consumer<ClienteRepository>(
+                          builder: (ctx, clientes, child) => RefreshIndicator(
+                            onRefresh: (() {
+                              return Future.delayed(
+                                Duration(microseconds: 500),
+                                (() {
+                                  setState(() {});
+                                }),
+                              );
+                            }),
+                            child: ListView.builder(
+                              itemCount: clientes.itemsCount,
+                              itemBuilder: (ctx, i) =>
+                                  ClienteListWidget(clientes.items[i]),
+                              physics: const AlwaysScrollableScrollPhysics(),
+                            ),
+                          ),
+                        );
+                      } else {
+                        return AppNoData();
+                      }
                     }
-                  }
-                }),
+                  }),
+                ),
               ),
-            )),
+            ),
           ],
-        )));
+        ),
+      ),
+    );
   }
 }

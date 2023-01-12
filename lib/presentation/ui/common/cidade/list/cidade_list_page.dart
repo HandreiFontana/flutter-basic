@@ -44,9 +44,22 @@ class _CidadeListPageState extends State<CidadeListPage> {
                     Map<String, dynamic> snapshotData = snapshot.data as Map<String, dynamic>;
                     if (snapshotData['items'].isNotEmpty) {
                       return Consumer<CidadeRepository>(
-                        builder: (ctx, cidades, child) => ListView.builder(
-                          itemCount: cidades.itemsCount,
-                          itemBuilder: (ctx, i) => CidadeListWidget(cidades.items[i]),
+                        builder: (ctx, cidades, child) => RefreshIndicator(
+                          onRefresh: (() {
+                            return Future.delayed(
+                              Duration(microseconds: 2),
+                              (() {
+                                setState(() {});
+                              }),
+                            );
+                          }),
+                          child: ListView.builder(
+                            itemCount: cidades.itemsCount,
+                            itemBuilder: (ctx, i) =>
+                                CidadeListWidget(cidades.items[i]),
+                            physics: const AlwaysScrollableScrollPhysics(),
+                          ),
+
                         ),
                       );
                     } else {
