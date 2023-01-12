@@ -48,7 +48,8 @@ class _CidadeListPageState extends State<CidadeListPage> {
                       return Consumer<CidadeRepository>(
                         builder: (ctx, cidades, child) => ListView.builder(
                           itemCount: cidades.itemsCount,
-                          itemBuilder: (ctx, i) => CidadeListWidget(cidades.items[i]),
+                          itemBuilder: (ctx, i) =>
+                              CidadeListWidget(cidades.items[i]),
                         ),
                       );
                     } else {

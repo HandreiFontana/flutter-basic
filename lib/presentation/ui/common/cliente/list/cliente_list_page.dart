@@ -48,7 +48,8 @@ class _ClienteListPageState extends State<ClienteListPage> {
                       return Consumer<ClienteRepository>(
                         builder: (ctx, clientes, child) => ListView.builder(
                           itemCount: clientes.itemsCount,
-                          itemBuilder: (ctx, i) => ClienteListWidget(clientes.items[i]),
+                          itemBuilder: (ctx, i) =>
+                              ClienteListWidget(clientes.items[i]),
                         ),
                       );
                     } else {
