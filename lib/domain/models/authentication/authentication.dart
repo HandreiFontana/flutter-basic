@@ -60,7 +60,7 @@ class Authentication with ChangeNotifier {
       _token = body['token'];
       _name = body['user']['name'];
       _login = body['user']['login'];
-      _isAdmin = body['user']['isAdmin'];
+      _isAdmin = body['user']['isAdmin'] ?? false;
       _userId = body['user']['login'];
       _mustChangePassword = body['user']['mustChangePassword'] ?? '';
 
