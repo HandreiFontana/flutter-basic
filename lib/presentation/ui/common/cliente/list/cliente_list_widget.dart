@@ -1,5 +1,5 @@
 import 'package:basic/presentation/components/app_confirm_action.dart';
-import 'package:basic/presentation/components/app_list%20_dismissible_card.dart';
+import 'package:basic/presentation/components/app_list_dismissible_card.dart';
 import 'package:flutter/material.dart';
 import 'package:basic/shared/themes/app_colors.dart';
 import 'package:basic/domain/models/common/cliente.dart';

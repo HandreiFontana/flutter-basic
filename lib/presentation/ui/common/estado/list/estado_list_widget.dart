@@ -1,8 +1,11 @@
+import 'package:basic/data/repositories/common/estado_repository.dart';
 import 'package:basic/presentation/components/app_confirm_action.dart';
-import 'package:basic/presentation/components/app_list%20_dismissible_card.dart';
+import 'package:basic/presentation/components/app_list_dismissible_card.dart';
+import 'package:basic/shared/config/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:basic/shared/themes/app_colors.dart';
 import 'package:basic/domain/models/common/estado.dart';
+import 'package:provider/provider.dart';
 
 class EstadoListWidget extends StatelessWidget {
   final Estado estado;
@@ -14,19 +17,16 @@ class EstadoListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //final msg = ScaffoldMessenger.of(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
     return AppDismissible(
-      endToStart: () {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return ConfirmActionWidget(
-              title: 'Sucesso',
-              message: 'Excluido com sucesso',
-              cancelButtonText: 'Fechar',
-            );
-          },
-        );
+      endToStart: () async {
+        await Provider.of<EstadoRepository>(context, listen: false).delete(estado).then((message) {
+          return scaffoldMessenger.showSnackBar(SnackBar(
+            content: Text(message),
+            duration: Duration(seconds: AppConstants.snackBarDuration),
+          ));
+        });
       },
       startToEnd: () {
         Map data = {'id': estado.id, 'view': false};
