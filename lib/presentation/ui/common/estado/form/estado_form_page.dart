@@ -70,6 +70,7 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
   Widget get nomeField {
     return FormTextInput(
       label: 'Nome',
+      isDisabled: isViewPage,
       controller: controllers.nome,
       isRequired: true,
       validator: (value) => value != '' ? null : 'Campo obrigatório!',
@@ -79,6 +80,7 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
   Widget get ufField {
     return FormTextInput(
       label: 'UF',
+      isDisabled: isViewPage,
       controller: controllers.uf,
       isRequired: true,
       validator: (value) => value != '' ? null : 'Campo obrigatório!',
@@ -86,13 +88,15 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
   }
 
   Widget get actionButtons {
-    return Row(
-      children: [
-        Expanded(child: AppFormButton(submit: _cancel, label: 'Cancelar')),
-        SizedBox(width: 10),
-        Expanded(child: AppFormButton(submit: _submit, label: 'Salvar')),
-      ],
-    );
+    return isViewPage
+        ? SizedBox.shrink()
+        : Row(
+            children: [
+              Expanded(child: AppFormButton(submit: _cancel, label: 'Cancelar')),
+              SizedBox(width: 10),
+              Expanded(child: AppFormButton(submit: _submit, label: 'Salvar')),
+            ],
+          );
   }
 
   // Functions

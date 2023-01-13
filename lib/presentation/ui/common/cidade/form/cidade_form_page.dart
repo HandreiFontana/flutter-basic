@@ -73,6 +73,7 @@ class _CidadeFormPageState extends State<CidadeFormPage> {
   Widget get nomeField {
     return FormTextInput(
       label: 'Nome',
+      isDisabled: isViewPage,
       controller: controllers.nome,
       isRequired: true,
       validator: (value) => value != '' ? null : 'Campo obrigatório!',
@@ -82,6 +83,7 @@ class _CidadeFormPageState extends State<CidadeFormPage> {
   Widget get estadoIdField {
     return FormSelectInput(
       label: 'UF',
+      isDisabled: isViewPage,
       controllerValue: controllers.estadoId,
       controllerLabel: controllers.estadoUf,
       isRequired: true,
@@ -90,13 +92,15 @@ class _CidadeFormPageState extends State<CidadeFormPage> {
   }
 
   Widget get actionButtons {
-    return Row(
-      children: [
-        Expanded(child: AppFormButton(submit: _cancel, label: 'Cancelar')),
-        SizedBox(width: 10),
-        Expanded(child: AppFormButton(submit: _submit, label: 'Salvar')),
-      ],
-    );
+    return isViewPage
+        ? SizedBox.shrink()
+        : Row(
+            children: [
+              Expanded(child: AppFormButton(submit: _cancel, label: 'Cancelar')),
+              SizedBox(width: 10),
+              Expanded(child: AppFormButton(submit: _submit, label: 'Salvar')),
+            ],
+          );
   }
 
   // Functions

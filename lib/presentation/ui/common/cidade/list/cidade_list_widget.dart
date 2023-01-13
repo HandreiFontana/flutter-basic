@@ -20,7 +20,7 @@ class CidadeListWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     Authentication authentication = Provider.of(context, listen: false);
-    
+
     return AppDismissible(
       direction: authentication.permitUpdateDelete('/cidades'),
       endToStart: () async {
@@ -36,16 +36,8 @@ class CidadeListWidget extends StatelessWidget {
         Navigator.of(context).pushReplacementNamed('/cidades-form', arguments: data);
       },
       onDoubleTap: () {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return ConfirmActionWidget(
-              title: 'Visualizar',
-              message: '${cidade.nome}\n${cidade.estadoUf}',
-              cancelButtonText: 'Fechar',
-            );
-          },
-        );
+        Map data = {'id': cidade.id, 'view': true};
+        Navigator.of(context).pushReplacementNamed('/cidades-form', arguments: data);
       },
       body: Column(
         children: <Widget>[
