@@ -29,6 +29,7 @@ class _EstadoListPageState extends State<EstadoListPage> {
       child: AppScaffold(
         title: Text('Estados'),
         route: '/estados-form',
+        showDrawer: true,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,

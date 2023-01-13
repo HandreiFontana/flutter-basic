@@ -28,6 +28,7 @@ class _ClienteListPageState extends State<ClienteListPage> {
       },
       child: AppScaffold(
         title: Text('Clientes'),
+        showDrawer: true,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,

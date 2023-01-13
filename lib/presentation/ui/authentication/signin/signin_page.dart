@@ -148,7 +148,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
       _showErrorDialog('Ocorreu um erro inesperado!');
     }
 
-    setState(() => _isLoading = false);
+    //setState(() => _isLoading = false);
   }
 
   Padding buildElevatedButton(BuildContext context) => Padding(
