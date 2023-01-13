@@ -65,7 +65,6 @@ class AppDismissible extends StatelessWidget {
         );
       },
       onDismissed: (direction) {
-        print('object');
         switch (direction) {
           case DismissDirection.endToStart:
             endToStart();

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:basic/data/store.dart';
 import 'package:basic/domain/models/authentication/authentication.dart';
 import 'package:basic/shared/exceptions/auth_exception.dart';
 import 'package:basic/shared/themes/app_colors.dart';
@@ -17,10 +18,19 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
   final _formKey = GlobalKey<FormState>();
   // ignore: unused_field
   bool _isLoading = false;
+  final _controllerLogin = TextEditingController();
   final Map<String, String> _authData = {
     'login': '',
     'password': '',
   };
+
+  Future<void> loadUserName() async {
+    _controllerLogin.text = await Store.getString('login');
+  }
+
+  Future<void> salveUserName() async {
+    Store.saveString('login', _controllerLogin.text);
+  }
 
   // App bar
 
@@ -47,20 +57,26 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
   // Email
 
   Widget get buildFormFieldEmail {
-    return Padding(
-      padding: const EdgeInsets.only(
-        bottom: 14.0,
-      ),
-      child: TextFormField(
-        decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-          labelText: 'Email',
-        ),
-        keyboardType: TextInputType.emailAddress,
-        onSaved: (login) => _authData['login'] = login ?? '',
-        validator: (value) =>
-            (value ?? '').isNotEmpty ? null : 'Campo obrigatório!',
-      ),
+    return FutureBuilder(
+      future: loadUserName(),
+      builder: (context, snapshot) {
+        return Padding(
+          padding: const EdgeInsets.only(
+            bottom: 14.0,
+          ),
+          child: TextFormField(
+            controller: _controllerLogin,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Email',
+            ),
+            keyboardType: TextInputType.emailAddress,
+            onSaved: (login) => _authData['login'] = login ?? '',
+            validator: (value) =>
+                (value ?? '').isNotEmpty ? null : 'Campo obrigatório!',
+          ),
+        );
+      },
     );
   }
 
@@ -124,6 +140,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
   }
 
   Future<void> _submit() async {
+    salveUserName();
     final isValid = _formKey.currentState?.validate() ?? false;
 
     if (!isValid) {
