@@ -28,6 +28,7 @@ class _ClienteListPageState extends State<ClienteListPage> {
       },
       child: AppScaffold(
         title: Text('Clientes'),
+        route: '/clientes-form',
         showDrawer: true,
         body: Center(
           child: Column(
@@ -43,17 +44,14 @@ class _ClienteListPageState extends State<ClienteListPage> {
               Expanded(
                 child: SizedBox(
                   child: FutureBuilder(
-                    future:
-                        Provider.of<ClienteRepository>(context, listen: false)
-                            .list(query, 50, 0, ['ASC', 'ASC']),
+                    future: Provider.of<ClienteRepository>(context, listen: false).list(query, 50, 0, ['ASC', 'ASC']),
                     builder: ((context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
                       } else if (snapshot.error != null) {
                         return AppNoData();
                       } else {
-                        Map<String, dynamic> snapshotData =
-                            snapshot.data as Map<String, dynamic>;
+                        Map<String, dynamic> snapshotData = snapshot.data as Map<String, dynamic>;
                         if (snapshotData['items'].isNotEmpty) {
                           return Consumer<ClienteRepository>(
                             builder: (ctx, clientes, child) => RefreshIndicator(
@@ -67,8 +65,7 @@ class _ClienteListPageState extends State<ClienteListPage> {
                               }),
                               child: ListView.builder(
                                 itemCount: clientes.itemsCount,
-                                itemBuilder: (ctx, i) =>
-                                    ClienteListWidget(clientes.items[i]),
+                                itemBuilder: (ctx, i) => ClienteListWidget(clientes.items[i]),
                                 physics: const AlwaysScrollableScrollPhysics(),
                               ),
                             ),

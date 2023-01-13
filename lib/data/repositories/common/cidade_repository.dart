@@ -1,7 +1,7 @@
 import 'dart:convert';
+import 'package:basic/domain/models/shared/suggestionSelect.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:basic/shared/exceptions/http_exception.dart';
 import 'package:basic/shared/config/app_constants.dart';
 import 'package:basic/domain/models/common/cidade.dart';
 
@@ -101,7 +101,7 @@ class CidadeRepository with ChangeNotifier {
   // get
 
   Future<Cidade> get(String id) async {
-    Cidade estado = Cidade();
+    Cidade cidade = Cidade();
 
     final url = '${AppConstants.apiUrl}/cidades/$id';
 
@@ -115,13 +115,46 @@ class CidadeRepository with ChangeNotifier {
 
     if (response.statusCode == 200) {
       Map<String, dynamic> data = jsonDecode(response.body);
-      estado.id = data['id'];
-      estado.nome = data['nome'];
-      estado.estadoId = data['estadoId'];
-      estado.estadoUf = data['estadoUf'];
+      cidade.id = data['id'];
+      cidade.nome = data['nome'];
+      cidade.estadoId = data['estadoId'];
+      cidade.estadoUf = data['estadoUf'];
     }
 
-    return estado;
+    return cidade;
+  }
+
+  // select
+
+  Future<List<Map<String, String>>> select(String search, String estadoId) async {
+    final url = '${AppConstants.apiUrl}/cidades/select?estadoId=$estadoId&filter=$search';
+
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $_token',
+      },
+    );
+
+    List<SuggestionModelSelect> suggestions = [];
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = jsonDecode(response.body);
+      suggestions = List<SuggestionModelSelect>.from(
+        data['items'].map((model) => SuggestionModelSelect.fromJson(model)),
+      );
+    }
+
+    return Future.value(
+      suggestions
+          .map(
+            (e) => {
+              'value': e.value,
+              'label': e.label,
+            },
+          )
+          .toList(),
+    );
   }
 
   // delete

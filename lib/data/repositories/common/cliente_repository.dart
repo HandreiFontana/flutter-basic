@@ -30,8 +30,7 @@ class ClienteRepository with ChangeNotifier {
   ) async {
     _clientes.clear();
 
-    final url =
-        '${AppConstants.apiUrl}/clientes?page=$page&pageSize=$rowsPerPage&search=$search';
+    final url = '${AppConstants.apiUrl}/clientes?page=$page&pageSize=$rowsPerPage&search=$search';
 
     final response = await http.get(
       Uri.parse(url),
@@ -55,6 +54,34 @@ class ClienteRepository with ChangeNotifier {
     notifyListeners();
 
     return data;
+  }
+
+  // get
+
+  Future<Cliente> get(String id) async {
+    Cliente cliente = Cliente();
+
+    final url = '${AppConstants.apiUrl}/clientes/$id';
+
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $_token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = jsonDecode(response.body);
+      cliente.id = data['id'];
+      cliente.nome = data['nome'];
+      cliente.estadoId = data['estadoId'];
+      cliente.estadoUf = data['estadoUf'];
+      cliente.cidadeId = data['cidadeId'];
+      cliente.cidadeNome = data['cidadeNome'];
+    }
+
+    return cliente;
   }
 
   // delete
