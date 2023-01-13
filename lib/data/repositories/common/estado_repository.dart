@@ -107,7 +107,7 @@ class EstadoRepository with ChangeNotifier {
 
   // delete
 
-  Future<void> delete(Estado estado) async {
+  Future<String> delete(Estado estado) async {
     int index = _estados.indexWhere((p) => p.id == estado.id);
 
     if (index >= 0) {
@@ -115,18 +115,26 @@ class EstadoRepository with ChangeNotifier {
       _estados.remove(estado);
       notifyListeners();
 
+      final url = '${AppConstants.apiUrl}/estados/${estado.id}';
+
       final response = await http.delete(
-        Uri.parse('${AppConstants.apiUrl}/estados/${estado.id}'),
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_token',
+        },
       );
 
-      if (response.statusCode >= 400) {
+      if (response.statusCode != 200) {
         _estados.insert(index, estado);
         notifyListeners();
-        throw HttpException(
-          msg: 'Não foi possível excluir o registro.',
-          statusCode: response.statusCode,
-        );
+
+        return jsonDecode(response.body)['message'];
       }
+
+      return 'Sucesso';
     }
+
+    return 'Item não encontrado';
   }
 }
