@@ -19,6 +19,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return AppScaffold(
       title: const Text('basic'),
+      showDrawer: true,
       body: AppMainMenu(),
     );
   }

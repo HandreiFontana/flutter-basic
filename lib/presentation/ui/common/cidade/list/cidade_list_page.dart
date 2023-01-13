@@ -28,6 +28,7 @@ class _CidadeListPageState extends State<CidadeListPage> {
       },
       child: AppScaffold(
         title: Text('Cidades'),
+        showDrawer: true,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,

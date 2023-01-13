@@ -7,13 +7,13 @@ class AppScaffold extends StatefulWidget {
     super.key,
     required this.title,
     required this.body,
-    this.showDrawer,
+    required this.showDrawer,
     this.route,
   });
 
   final Widget title;
   final Widget body;
-  final bool? showDrawer;
+  final bool showDrawer;
   final String? route;
 
   @override
@@ -29,7 +29,7 @@ class _AppScaffoldState extends State<AppScaffold> {
         backgroundColor: AppColors.primary,
       ),
       body: widget.body,
-      drawer: widget.showDrawer != null ? AppDrawer() : null,
+      drawer: widget.showDrawer ? AppDrawer() : null,
       floatingActionButton: widget.route == null
           ? null
           : FloatingActionButton(

@@ -28,6 +28,7 @@ class _ClienteListPageState extends State<ClienteListPage> {
       },
       child: AppScaffold(
         title: Text('Clientes'),
+        showDrawer: true,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -49,29 +50,6 @@ class _ClienteListPageState extends State<ClienteListPage> {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
                       } else if (snapshot.error != null) {
-
-                      return AppNoData();
-                    } else {
-                      Map<String, dynamic> snapshotData = snapshot.data as Map<String, dynamic>;
-                      if (snapshotData['items'].isNotEmpty) {
-                        return Consumer<ClienteRepository>(
-                          builder: (ctx, clientes, child) => RefreshIndicator(
-                            onRefresh: (() {
-                              return Future.delayed(
-                                Duration(microseconds: 500),
-                                (() {
-                                  setState(() {});
-                                }),
-                              );
-                            }),
-                            child: ListView.builder(
-                              itemCount: clientes.itemsCount,
-                              itemBuilder: (ctx, i) => ClienteListWidget(clientes.items[i]),
-                              physics: const AlwaysScrollableScrollPhysics(),
-                            ),
-                          ),
-                        );
-                      } else {
                         return AppNoData();
                       } else {
                         Map<String, dynamic> snapshotData =
