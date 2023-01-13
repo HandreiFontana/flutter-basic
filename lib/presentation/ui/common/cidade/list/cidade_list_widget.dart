@@ -1,8 +1,11 @@
+import 'package:basic/data/repositories/common/cidade_repository.dart';
 import 'package:basic/presentation/components/app_confirm_action.dart';
 import 'package:basic/presentation/components/app_list_dismissible_card.dart';
+import 'package:basic/shared/config/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:basic/shared/themes/app_colors.dart';
 import 'package:basic/domain/models/common/cidade.dart';
+import 'package:provider/provider.dart';
 
 class CidadeListWidget extends StatelessWidget {
   final Cidade cidade;
@@ -14,31 +17,20 @@ class CidadeListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //final msg = ScaffoldMessenger.of(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
     return AppDismissible(
-      endToStart: () {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return ConfirmActionWidget(
-              title: 'Sucesso',
-              message: 'Excluido com sucesso',
-              cancelButtonText: 'Fechar',
-            );
-          },
-        );
+      endToStart: () async {
+        await Provider.of<CidadeRepository>(context, listen: false).delete(cidade).then((message) {
+          return scaffoldMessenger.showSnackBar(SnackBar(
+            content: Text(message),
+            duration: Duration(seconds: AppConstants.snackBarDuration),
+          ));
+        });
       },
       startToEnd: () {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return ConfirmActionWidget(
-              title: 'Sucesso',
-              message: 'Editado com sucesso',
-              cancelButtonText: 'Fechar',
-            );
-          },
-        );
+        Map data = {'id': cidade.id, 'view': false};
+        Navigator.of(context).pushReplacementNamed('/cidades-form', arguments: data);
       },
       onDoubleTap: () {
         showDialog(
