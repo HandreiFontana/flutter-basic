@@ -1,3 +1,5 @@
+import 'package:basic/presentation/providers/common/user_provider.dart';
+
 import './authentication/authentication_provider.dart';
 import './common/estado_provider.dart';
 import './common/cidade_provider.dart';
@@ -9,5 +11,6 @@ mixin AppProviders {
     ...estadoProvider,
     ...cidadeProvider,
     ...clienteProvider,
+    ...userProvider,
   ];
 }

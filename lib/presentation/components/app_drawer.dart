@@ -1,8 +1,6 @@
 import 'package:basic/domain/models/authentication/authentication.dart';
 import 'package:flutter/material.dart';
 import 'package:basic/shared/themes/app_colors.dart';
-
-import 'package:basic/shared/config/app_menu_options.dart';
 import 'package:provider/provider.dart';
 
 class AppDrawer extends StatelessWidget {

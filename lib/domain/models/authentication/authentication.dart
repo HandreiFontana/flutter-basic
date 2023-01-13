@@ -12,7 +12,9 @@ import 'package:http/http.dart' as http;
 class Authentication with ChangeNotifier {
   String? _token;
   String? _login;
+  // ignore: unused_field
   String? _name;
+  // ignore: unused_field
   bool _isAdmin = false;
   String _mustChangePassword = '';
   String? _userId;

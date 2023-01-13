@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:basic/shared/exceptions/http_exception.dart';
 import 'package:basic/shared/config/app_constants.dart';
 import 'package:basic/domain/models/common/estado.dart';
 
