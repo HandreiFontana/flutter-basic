@@ -80,6 +80,31 @@ class EstadoRepository with ChangeNotifier {
     return data;
   }
 
+  // Get
+
+  Future<Estado> get(String id) async {
+    Estado estado = Estado();
+
+    final url = '${AppConstants.apiUrl}/estados/$id';
+
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $_token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = jsonDecode(response.body);
+      estado.id = data['id'];
+      estado.nome = data['nome'];
+      estado.uf = data['uf'];
+    }
+
+    return estado;
+  }
+
   // delete
 
   Future<void> delete(Estado estado) async {

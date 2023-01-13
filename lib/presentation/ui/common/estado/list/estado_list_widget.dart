@@ -29,16 +29,8 @@ class EstadoListWidget extends StatelessWidget {
         );
       },
       startToEnd: () {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return ConfirmActionWidget(
-              title: 'Sucesso',
-              message: 'Editado com sucesso',
-              cancelButtonText: 'Fechar',
-            );
-          },
-        );
+        Map data = {'id': estado.id, 'view': false};
+        Navigator.of(context).pushReplacementNamed('/estados-form', arguments: data);
       },
       onDoubleTap: () {
         showDialog(

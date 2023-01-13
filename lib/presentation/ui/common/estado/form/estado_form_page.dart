@@ -1,10 +1,10 @@
 import 'package:basic/data/repositories/common/estado_repository.dart';
 import 'package:basic/domain/models/common/estado.dart';
 import 'package:basic/presentation/components/app_confirm_action.dart';
+import 'package:basic/presentation/components/app_form_button.dart';
 import 'package:basic/presentation/components/app_scaffold.dart';
 import 'package:basic/presentation/components/inputs/app_form_text_input_widget.dart';
 import 'package:basic/shared/exceptions/auth_exception.dart';
-import 'package:basic/shared/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,6 +17,8 @@ class EstadoFormPage extends StatefulWidget {
 
 class _EstadoFormPageState extends State<EstadoFormPage> {
   final _formKey = GlobalKey<FormState>();
+  bool dataIsLoaded = false;
+  bool isViewPage = false;
 
   final controllers = EstadoController(
     id: TextEditingController(),
@@ -24,8 +26,18 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
     uf: TextEditingController(),
   );
 
+  // Builder
+
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments as dynamic;
+    if (args != null && !dataIsLoaded) {
+      controllers.id.text = args['id'] ?? '';
+      _loadData(controllers.id.text);
+      isViewPage = args['view'] ?? false;
+      dataIsLoaded = true;
+    }
+
     return AppScaffold(
       title: Text('Estados Form'),
       showDrawer: true,
@@ -42,12 +54,18 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [nomeField, ufField, buildElevatedButton(context)],
+            children: [
+              nomeField,
+              ufField,
+              actionButtons,
+            ],
           ),
         ),
       ),
     );
   }
+
+  // Form Fields
 
   Widget get nomeField {
     return FormTextInput(
@@ -67,25 +85,29 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
     );
   }
 
-  Padding buildElevatedButton(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(top: 15),
-        child: ElevatedButton(
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(AppColors.primary),
-            padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(20)),
-            foregroundColor: MaterialStateProperty.all<Color>(AppColors.background),
-          ),
-          onPressed: _submit,
-          child: const SizedBox(
-            width: double.infinity,
-            child: Text(
-              'Salvar',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 20),
-            ),
-          ),
-        ),
-      );
+  Widget get actionButtons {
+    return Row(
+      children: [
+        Expanded(child: AppFormButton(submit: _cancel, label: 'Cancelar')),
+        SizedBox(width: 10),
+        Expanded(child: AppFormButton(submit: _submit, label: 'Salvar')),
+      ],
+    );
+  }
+
+  // Functions
+
+  Future<void> _loadData(String id) async {
+    await Provider.of<EstadoRepository>(context, listen: false).get(id).then((estado) => _populateController(estado));
+  }
+
+  Future<void> _populateController(Estado estado) async {
+    setState(() {
+      controllers.id.text = estado.id ?? '';
+      controllers.nome.text = estado.nome ?? '';
+      controllers.uf.text = estado.uf ?? '';
+    });
+  }
 
   Future<void> _submit() async {
     final isValid = _formKey.currentState?.validate() ?? false;
@@ -102,22 +124,15 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
         'nome': controllers.nome.text,
         'uf': controllers.uf.text,
       };
-      // ignore: unused_local_variable
-      final response = await Provider.of<EstadoRepository>(context, listen: false).save(payload).then((validado) {
+
+      await Provider.of<EstadoRepository>(context, listen: false).save(payload).then((validado) {
         if (validado) {
           return showDialog(
             context: context,
             builder: (context) {
-              return ConfirmActionWidget(message: 'Cliente criado com sucesso!', cancelButtonText: 'Ok');
+              return ConfirmActionWidget(message: 'Estado criado com sucesso!', cancelButtonText: 'Ok');
             },
-          );
-        } else {
-          return showDialog(
-            context: context,
-            builder: (context) {
-              return ConfirmActionWidget(message: 'CPF/CNPJ já registrado para outro cliente!', cancelButtonText: 'Ok');
-            },
-          );
+          ).then((value) => Navigator.of(context).pushReplacementNamed('/estados'));
         }
       });
     } on AuthException catch (error) {
@@ -135,5 +150,22 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
         },
       );
     }
+  }
+
+  Future<void> _cancel() async {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return ConfirmActionWidget(
+          message: 'Tem certeza que deseja sair?',
+          cancelButtonText: 'Não',
+          confirmButtonText: 'Sim',
+        );
+      },
+    ).then((value) {
+      if (value) {
+        Navigator.of(context).pushReplacementNamed('/estados');
+      }
+    });
   }
 }
