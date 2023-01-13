@@ -7,13 +7,11 @@ class FormSelectInput extends StatefulWidget {
   FormSelectInput({
     super.key,
     required this.label,
-    required this.authDataValue,
-    required this.authDateLabel,
     this.hintText,
     required this.controllerValue,
     required this.controllerLabel,
     required this.itemsCallback,
-    required this.onSaved,
+    this.onSaved,
     this.clear,
     this.isVisible,
     this.isRequired,
@@ -21,19 +19,11 @@ class FormSelectInput extends StatefulWidget {
   });
 
   final String label;
-  final String authDataValue;
-  final String authDateLabel;
   final String? hintText;
   final TextEditingController controllerValue;
   final TextEditingController controllerLabel;
   final Future<Iterable<Map<String, String>>> Function(String value) itemsCallback;
-  final Function(
-    String value,
-    String label,
-    TextEditingController controllerValue,
-    TextEditingController controllerLabel,
-    Map<String, String> suggestion,
-  ) onSaved;
+  final Function(Map<String, String> suggestion)? onSaved;
   bool? clear = false;
   final bool? isVisible;
   final bool? isRequired;
@@ -81,47 +71,37 @@ class _FormSelectInputState extends State<FormSelectInput> {
             SizedBox(
               height: 55,
               child: TypeAheadField(
-                textFieldConfiguration: TextFieldConfiguration(
-                  decoration: InputDecoration(
-                    hintText: widget.hintText,
-                    border: OutlineInputBorder(),
-                    isDense: true,
-                    contentPadding: EdgeInsets.all(8),
-                    suffixIcon: widget.clear ?? false
-                        ? IconButton(
-                            onPressed: () {
-                              widget.onSaved(
-                                widget.authDataValue,
-                                widget.authDateLabel,
-                                widget.controllerValue,
-                                widget.controllerLabel,
-                                <String, String>{
-                                  'label': '',
-                                  'value': '',
-                                },
-                              );
-                            },
-                            icon: Icon(Icons.close),
-                          )
-                        : null,
+                  textFieldConfiguration: TextFieldConfiguration(
+                    decoration: InputDecoration(
+                      hintText: widget.hintText,
+                      border: OutlineInputBorder(),
+                      isDense: true,
+                      contentPadding: EdgeInsets.all(8),
+                      suffixIcon: widget.clear ?? false
+                          ? IconButton(
+                              onPressed: () {
+                                widget.controllerValue.text = '';
+                                widget.controllerLabel.text = '';
+                              },
+                              icon: Icon(Icons.close),
+                            )
+                          : null,
+                    ),
+                    controller: widget.controllerLabel,
+                    enabled: widget.isDisabled != null ? !widget.isDisabled! : true,
                   ),
-                  controller: widget.controllerLabel,
-                  enabled: widget.isDisabled != null ? !widget.isDisabled! : true,
-                ),
-                suggestionsCallback: (pattern) async => widget.itemsCallback(pattern),
-                itemBuilder: (context, Map<String, String> suggestion) {
-                  return ListTile(
-                    title: Text(suggestion['label']!),
-                  );
-                },
-                onSuggestionSelected: (Map<String, String> suggestion) => widget.onSaved(
-                  widget.authDataValue,
-                  widget.authDateLabel,
-                  widget.controllerValue,
-                  widget.controllerLabel,
-                  suggestion,
-                ),
-              ),
+                  suggestionsCallback: (pattern) async => widget.itemsCallback(pattern),
+                  itemBuilder: (context, Map<String, String> suggestion) {
+                    return ListTile(
+                      title: Text(suggestion['label']!),
+                    );
+                  },
+                  onSuggestionSelected: widget.onSaved != null
+                      ? (Map<String, String> suggestion) => widget.onSaved!(suggestion)
+                      : (Map<String, String> suggestion) {
+                          widget.controllerValue.text = suggestion['value'] ?? '';
+                          widget.controllerLabel.text = suggestion['label'] ?? '';
+                        }),
             ),
           ],
         ),

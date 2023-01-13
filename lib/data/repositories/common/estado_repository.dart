@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:basic/domain/models/shared/suggestionSelect.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:basic/shared/exceptions/http_exception.dart';
@@ -80,7 +81,7 @@ class EstadoRepository with ChangeNotifier {
     return data;
   }
 
-  // Get
+  // get
 
   Future<Estado> get(String id) async {
     Estado estado = Estado();
@@ -103,6 +104,39 @@ class EstadoRepository with ChangeNotifier {
     }
 
     return estado;
+  }
+
+  // select
+
+  Future<List<Map<String, String>>> select(String search) async {
+    final url = '${AppConstants.apiUrl}/estados/select?filter=$search';
+
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $_token',
+      },
+    );
+
+    List<SuggestionModelSelect> suggestions = [];
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = jsonDecode(response.body);
+      suggestions = List<SuggestionModelSelect>.from(
+        data['items'].map((model) => SuggestionModelSelect.fromJson(model)),
+      );
+    }
+
+    return Future.value(
+      suggestions
+          .map(
+            (e) => {
+              'value': e.value,
+              'label': e.label,
+            },
+          )
+          .toList(),
+    );
   }
 
   // delete
