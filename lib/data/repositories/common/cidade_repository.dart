@@ -27,8 +27,25 @@ class CidadeRepository with ChangeNotifier {
   ) async {
     const url = '${AppConstants.apiUrl}/cidades';
 
-    final response = await http.post(
-      Uri.parse(url),
+    if (data['id'] == '') {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_token',
+        },
+        body: jsonEncode(data),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      }
+
+      return false;
+    }
+
+    final response = await http.put(
+      Uri.parse('$url/${data['id']!}'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $_token',

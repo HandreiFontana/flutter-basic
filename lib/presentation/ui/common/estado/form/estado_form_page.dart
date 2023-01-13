@@ -130,7 +130,10 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
           return showDialog(
             context: context,
             builder: (context) {
-              return ConfirmActionWidget(message: 'Estado criado com sucesso!', cancelButtonText: 'Ok');
+              return ConfirmActionWidget(
+                message: controllers.id.text == '' ? 'Estado criado com sucesso!' : 'Estado atualizado com sucesso!',
+                cancelButtonText: 'Ok',
+              );
             },
           ).then((value) => Navigator.of(context).pushReplacementNamed('/estados'));
         }

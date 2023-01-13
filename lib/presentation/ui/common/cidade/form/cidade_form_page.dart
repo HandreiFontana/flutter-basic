@@ -135,7 +135,10 @@ class _CidadeFormPageState extends State<CidadeFormPage> {
           return showDialog(
             context: context,
             builder: (context) {
-              return ConfirmActionWidget(message: 'Cidade criado com sucesso!', cancelButtonText: 'Ok');
+              return ConfirmActionWidget(
+                message: controllers.id.text == '' ? 'Cidade criada com sucesso!' : 'Cidade atualizada com sucesso!',
+                cancelButtonText: 'Ok',
+              );
             },
           ).then((value) => Navigator.of(context).pushReplacementNamed('/cidades'));
         }

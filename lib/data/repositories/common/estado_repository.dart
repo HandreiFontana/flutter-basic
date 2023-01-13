@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:basic/domain/models/shared/suggestionSelect.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:basic/shared/exceptions/http_exception.dart';
 import 'package:basic/shared/config/app_constants.dart';
 import 'package:basic/domain/models/common/estado.dart';
 
@@ -28,8 +27,25 @@ class EstadoRepository with ChangeNotifier {
   ) async {
     const url = '${AppConstants.apiUrl}/estados';
 
-    final response = await http.post(
-      Uri.parse(url),
+    if (data['id'] == '') {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_token',
+        },
+        body: jsonEncode(data),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      }
+
+      return false;
+    }
+
+    final response = await http.put(
+      Uri.parse('$url/${data['id']!}'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $_token',
