@@ -17,10 +17,19 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return AppScaffold(
-      title: const Text('basic'),
-      showDrawer: true,
-      body: AppMainMenu(),
+    return WillPopScope(
+      onWillPop: () async {
+        bool retorno = true;
+
+        Navigator.of(context).pushReplacementNamed('/');
+
+        return retorno;
+      },
+      child: AppScaffold(
+        title: const Text('basic'),
+        showDrawer: true,
+        body: AppMainMenu(),
+      ),
     );
   }
 }
