@@ -5,7 +5,6 @@ import 'package:basic/presentation/components/app_form_button.dart';
 import 'package:basic/presentation/components/app_scaffold.dart';
 import 'package:basic/presentation/components/inputs/app_form_text_input_widget.dart';
 import 'package:basic/shared/exceptions/auth_exception.dart';
-import 'package:basic/shared/utils/arguments.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -18,6 +17,7 @@ class EstadoFormPage extends StatefulWidget {
 
 class _EstadoFormPageState extends State<EstadoFormPage> {
   final _formKey = GlobalKey<FormState>();
+  bool dataIsLoaded = false;
   bool isViewPage = false;
 
   final controllers = EstadoController(
@@ -26,20 +26,18 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
     uf: TextEditingController(),
   );
 
-  @override
-  void initState() {
-    final args = ModalRoute.of(context)!.settings.arguments as Arguments?;
-    if (args != null) {
-      controllers.id.text = args.data['id'] ?? '';
-      _loadData(controllers.id.text);
-      isViewPage = args.data['view'] ?? false;
-    }
-
-    super.initState();
-  }
+  // Builder
 
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments as dynamic;
+    if (args != null && !dataIsLoaded) {
+      controllers.id.text = args['id'] ?? '';
+      _loadData(controllers.id.text);
+      isViewPage = args['view'] ?? false;
+      dataIsLoaded = true;
+    }
+
     return AppScaffold(
       title: Text('Estados Form'),
       showDrawer: true,
@@ -66,6 +64,8 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
       ),
     );
   }
+
+  // Form Fields
 
   Widget get nomeField {
     return FormTextInput(
@@ -94,6 +94,8 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
       ],
     );
   }
+
+  // Functions
 
   Future<void> _loadData(String id) async {
     await Provider.of<EstadoRepository>(context, listen: false).get(id).then((estado) => _populateController(estado));
