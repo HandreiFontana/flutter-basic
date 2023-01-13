@@ -1,8 +1,10 @@
+import 'package:basic/domain/models/authentication/authentication.dart';
 import 'package:basic/presentation/components/app_confirm_action.dart';
 import 'package:basic/presentation/components/app_list%20_dismissible_card.dart';
 import 'package:flutter/material.dart';
 import 'package:basic/shared/themes/app_colors.dart';
 import 'package:basic/domain/models/common/cidade.dart';
+import 'package:provider/provider.dart';
 
 class CidadeListWidget extends StatelessWidget {
   final Cidade cidade;
@@ -14,8 +16,9 @@ class CidadeListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //final msg = ScaffoldMessenger.of(context);
+    Authentication authentication = Provider.of(context, listen: false);
     return AppDismissible(
+      direction: authentication.permitUpdateDelete('/cidades'),
       endToStart: () {
         showDialog(
           context: context,

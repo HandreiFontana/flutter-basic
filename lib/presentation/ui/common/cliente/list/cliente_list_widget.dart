@@ -1,8 +1,10 @@
+import 'package:basic/domain/models/authentication/authentication.dart';
 import 'package:basic/presentation/components/app_confirm_action.dart';
 import 'package:basic/presentation/components/app_list%20_dismissible_card.dart';
 import 'package:flutter/material.dart';
 import 'package:basic/shared/themes/app_colors.dart';
 import 'package:basic/domain/models/common/cliente.dart';
+import 'package:provider/provider.dart';
 
 class ClienteListWidget extends StatelessWidget {
   final Cliente cliente;
@@ -14,9 +16,15 @@ class ClienteListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //final msg = ScaffoldMessenger.of(context);
+    Authentication authentication = Provider.of(context, listen: false);
+    final msg = ScaffoldMessenger.of(context);
     return AppDismissible(
+      direction: authentication.permitUpdateDelete('/cliente'),
       endToStart: () {
+        msg.showSnackBar(SnackBar(
+          content: Text('teste'),
+          duration: Duration(seconds: 1),
+        ));
         showDialog(
           context: context,
           builder: (context) {

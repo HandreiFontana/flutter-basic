@@ -3,6 +3,8 @@ import 'dart:convert';
 
 import 'package:basic/data/store.dart';
 import 'package:basic/shared/config/app_constants.dart';
+import 'package:basic/shared/config/app_menu_icons.dart';
+import 'package:basic/shared/config/app_menu_options.dart';
 import 'package:basic/shared/exceptions/auth_exception.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -10,9 +12,13 @@ import 'package:http/http.dart' as http;
 class Authentication with ChangeNotifier {
   String? _token;
   String? _login;
+  String? _name;
+  bool _isAdmin = false;
+  String _mustChangePassword = '';
   String? _userId;
   DateTime? _expiryDate;
   Timer? _logoutTimer;
+  List<dynamic>? _permissions;
 
   bool get isAuth {
     final isValid = _expiryDate?.isAfter(DateTime.now()) ?? false;
@@ -31,7 +37,7 @@ class Authentication with ChangeNotifier {
     return isAuth ? _userId : null;
   }
 
-  Future<void> _authenticate(
+  Future<String> _authenticate(
     String login,
     String password,
     String urlFragment,
@@ -52,8 +58,11 @@ class Authentication with ChangeNotifier {
       throw AuthException(body['message']);
     } else {
       _token = body['token'];
+      _name = body['user']['name'];
       _login = body['user']['login'];
+      _isAdmin = body['user']['isAdmin'];
       _userId = body['user']['login'];
+      _mustChangePassword = body['user']['mustChangePassword'] ?? '';
 
       _expiryDate = DateTime.now().add(
         Duration(
@@ -71,14 +80,119 @@ class Authentication with ChangeNotifier {
       _autoLogout();
       notifyListeners();
     }
+    return _mustChangePassword;
   }
 
-  Future<void> signup(String login, String password) async {
-    return _authenticate(login, password, 'signUp');
+  Future<void> getMenu() async {
+    const url = '${AppConstants.apiUrl}/users-security/get-menu';
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $_token',
+      },
+    );
+
+    final body = jsonDecode(response.body);
+
+    if (response.statusCode != 200) {
+      throw AuthException(body['message']);
+    } else {
+      _permissions = body['data'];
+
+      Store.saveMap('permissons', {'permissons': _permissions});
+
+      notifyListeners();
+    }
   }
 
-  Future<void> login(String login, String password) async {
-    return _authenticate(login, password, 'signInWithPassword');
+  bool isPermitted(String route, String permission) {
+    Map<String, dynamic> permissionsPage = {};
+
+    _permissions?.forEach((e) {
+      final List<dynamic> subMenuOptions = e['subMenuOptions'];
+
+      final int indexOfPermissionsPage = subMenuOptions.indexWhere((element) => element['route'] == route);
+
+      if (indexOfPermissionsPage != -1) {
+        permissionsPage = subMenuOptions.elementAt(indexOfPermissionsPage);
+      }
+    });
+
+    final bool isPermitted = (permissionsPage['permitAll'] ?? false) || (permissionsPage[permission] ?? false);
+
+    return isPermitted;
+  }
+
+  DismissDirection permitUpdateDelete(String route) {
+    Map<String, dynamic> permissionsPage = {};
+
+    _permissions?.forEach((e) {
+      final List<dynamic> subMenuOptions = e['subMenuOptions'];
+
+      final int indexOfPermissionsPage = subMenuOptions.indexWhere((element) => element['route'] == route);
+
+      if (indexOfPermissionsPage != -1) {
+        permissionsPage = subMenuOptions.elementAt(indexOfPermissionsPage);
+      }
+    });
+
+    final bool isPermitted = permissionsPage['permitUpdate'] && permissionsPage['permitDelete'];
+
+    if (permissionsPage['permitAll'] || isPermitted) {
+      return DismissDirection.horizontal;
+    }
+
+    if (permissionsPage['permitUpdate']) {
+      return DismissDirection.startToEnd;
+    }
+
+    if (permissionsPage['permitDelete']) {
+      return DismissDirection.endToStart;
+    }
+
+    return DismissDirection.none;
+  }
+
+  List<MenuData> getMenusOption() {
+    List<MenuData> menu = [
+      MenuData(
+        Icons.home,
+        'Home',
+        '/home',
+        false,
+      )
+    ];
+
+    _permissions?.forEach((menuOption) {
+      final List<dynamic> subMenuOptions = menuOption['subMenuOptions'];
+
+      for (var subMenuOption in subMenuOptions) {
+        int indexIcon = icons.indexWhere((element) => element.iconName == subMenuOption['icon']);
+
+        menu.add(MenuData(
+          indexIcon != -1 ? icons[indexIcon].icon : icons[0].icon,
+          subMenuOption['text'],
+          subMenuOption['route'],
+          true,
+        ));
+      }
+    });
+    menu.add(
+      MenuData(Icons.exit_to_app, 'Sair', '/', false),
+    );
+
+    return menu;
+  }
+
+  // Future<void> signup(String login, String password) async {
+  //   return _authenticate(login, password, 'signUp');
+  // }
+
+  Future<String> login(String login, String password) async {
+    final response = await _authenticate(login, password, 'signInWithPassword');
+    await getMenu();
+    return response;
   }
 
   Future<void> tryAutoLogin() async {
