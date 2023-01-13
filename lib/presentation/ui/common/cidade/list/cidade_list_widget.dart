@@ -1,4 +1,5 @@
 import 'package:basic/data/repositories/common/cidade_repository.dart';
+import 'package:basic/domain/models/authentication/authentication.dart';
 import 'package:basic/presentation/components/app_confirm_action.dart';
 import 'package:basic/presentation/components/app_list_dismissible_card.dart';
 import 'package:basic/shared/config/app_constants.dart';
@@ -18,8 +19,10 @@ class CidadeListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-
+    Authentication authentication = Provider.of(context, listen: false);
+    
     return AppDismissible(
+      direction: authentication.permitUpdateDelete('/cidades'),
       endToStart: () async {
         await Provider.of<CidadeRepository>(context, listen: false).delete(cidade).then((message) {
           return scaffoldMessenger.showSnackBar(SnackBar(

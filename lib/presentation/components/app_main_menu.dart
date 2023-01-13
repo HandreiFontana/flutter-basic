@@ -1,7 +1,7 @@
+import 'package:basic/domain/models/authentication/authentication.dart';
 import 'package:flutter/material.dart';
 import 'package:basic/shared/themes/app_colors.dart';
-
-import 'package:basic/shared/config/app_menu_options.dart';
+import 'package:provider/provider.dart';
 
 class AppMainMenu extends StatefulWidget {
   const AppMainMenu({super.key});
@@ -17,6 +17,8 @@ class MainMenuBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Authentication authentication = Provider.of(context, listen: false);
+    final menu = authentication.getMenusOption();
     return Scrollbar(
       thickness: 3,
       child: Padding(
@@ -29,21 +31,16 @@ class MainMenuBody extends StatelessWidget {
                 shrinkWrap: true,
                 physics: BouncingScrollPhysics(),
                 itemCount: menu.length - 2,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    childAspectRatio: 1,
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 4.0,
-                    mainAxisSpacing: 4.0),
+                gridDelegate:
+                    SliverGridDelegateWithFixedCrossAxisCount(childAspectRatio: 1, crossAxisCount: 2, crossAxisSpacing: 4.0, mainAxisSpacing: 4.0),
                 itemBuilder: (BuildContext context, int index) {
                   return (Card(
                     color: AppColors.cardColor,
                     elevation: 0.4,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
                     child: InkWell(
                       onTap: () {
-                        Navigator.of(context)
-                            .pushReplacementNamed(menu[index + 1].route);
+                        Navigator.of(context).pushReplacementNamed(menu[index + 1].route);
                       },
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -58,8 +55,7 @@ class MainMenuBody extends StatelessWidget {
                           Text(
                             menu[index + 1].title,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 20, color: AppColors.background),
+                            style: TextStyle(fontSize: 20, color: AppColors.background),
                           ),
                         ],
                       ),
