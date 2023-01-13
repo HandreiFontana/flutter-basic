@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 class AppDismissible extends StatelessWidget {
   final Widget body;
+  final DismissDirection? direction;
   final void Function() endToStart;
   final void Function() startToEnd;
   final void Function() onDoubleTap;
@@ -12,6 +13,7 @@ class AppDismissible extends StatelessWidget {
   const AppDismissible({
     super.key,
     required this.body,
+    this.direction,
     required this.endToStart,
     required this.startToEnd,
     required this.onDoubleTap,
@@ -20,6 +22,7 @@ class AppDismissible extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
+      direction: direction ?? DismissDirection.none,
       background: Container(
         padding: EdgeInsets.all(10),
         margin: EdgeInsets.all(10),
@@ -40,7 +43,7 @@ class AppDismissible extends StatelessWidget {
           color: Colors.white,
         ),
       ),
-      confirmDismiss: (direction) async {
+      confirmDismiss: (direction) {
         String acao = '';
         switch (direction) {
           case DismissDirection.endToStart:
@@ -52,10 +55,11 @@ class AppDismissible extends StatelessWidget {
           default:
             false;
         }
-        return await showDialog(
+        return showDialog(
           context: context,
           builder: (context) {
             return ConfirmActionWidget(
+              title: 'Edição',
               message: 'Deseja realmente $acao esse registro?',
               confirmButtonText: 'Sim',
               cancelButtonText: 'Não',

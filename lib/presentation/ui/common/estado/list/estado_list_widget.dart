@@ -1,7 +1,6 @@
-import 'package:basic/data/repositories/common/estado_repository.dart';
+import 'package:basic/domain/models/authentication/authentication.dart';
 import 'package:basic/presentation/components/app_confirm_action.dart';
 import 'package:basic/presentation/components/app_list_dismissible_card.dart';
-import 'package:basic/shared/config/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:basic/shared/themes/app_colors.dart';
 import 'package:basic/domain/models/common/estado.dart';
@@ -17,16 +16,20 @@ class EstadoListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-
+    Authentication authentication = Provider.of(context, listen: false);
     return AppDismissible(
-      endToStart: () async {
-        await Provider.of<EstadoRepository>(context, listen: false).delete(estado).then((message) {
-          return scaffoldMessenger.showSnackBar(SnackBar(
-            content: Text(message),
-            duration: Duration(seconds: AppConstants.snackBarDuration),
-          ));
-        });
+      direction: authentication.permitUpdateDelete('/estados'),
+      endToStart: () {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return ConfirmActionWidget(
+              title: 'Sucesso',
+              message: 'Excluido com sucesso',
+              cancelButtonText: 'Fechar',
+            );
+          },
+        );
       },
       startToEnd: () {
         Map data = {'id': estado.id, 'view': false};
