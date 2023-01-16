@@ -2,7 +2,6 @@ import 'package:basic/data/repositories/common/cidade_repository.dart';
 import 'package:basic/data/repositories/common/cliente_repository.dart';
 import 'package:basic/data/repositories/common/estado_repository.dart';
 import 'package:basic/domain/models/common/cliente.dart';
-import 'package:basic/domain/models/shared/text_input_types.dart';
 import 'package:basic/presentation/components/app_confirm_action.dart';
 import 'package:basic/presentation/components/app_form_button.dart';
 import 'package:basic/presentation/components/app_scaffold.dart';
@@ -21,10 +20,10 @@ class ClienteFormPage extends StatefulWidget {
 
 class _ClienteFormPageState extends State<ClienteFormPage> {
   final _formKey = GlobalKey<FormState>();
-  bool dataIsLoaded = false;
-  bool isViewPage = false;
+  bool _dataIsLoaded = false;
+  bool _isViewPage = false;
 
-  final controllers = ClienteController(
+  final _controllers = ClienteController(
     id: TextEditingController(),
     nome: TextEditingController(),
     estadoId: TextEditingController(),
@@ -38,17 +37,17 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as dynamic;
-    if (args != null && !dataIsLoaded) {
-      controllers.id.text = args['id'] ?? '';
-      _loadData(controllers.id.text);
-      isViewPage = args['view'] ?? false;
-      dataIsLoaded = true;
+    if (args != null && !_dataIsLoaded) {
+      _controllers.id.text = args['id'] ?? '';
+      _loadData(_controllers.id.text);
+      _isViewPage = args['view'] ?? false;
+      _dataIsLoaded = true;
     }
 
     return WillPopScope(
       onWillPop: () async {
         bool retorno = true;
-        isViewPage
+        _isViewPage
             ? Navigator.of(context).pushNamedAndRemoveUntil('/clientes', (route) => false)
             : await showDialog(
                 context: context,
@@ -81,10 +80,10 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              nomeField,
-              estadoIdField,
-              cidadeIdField,
-              actionButtons,
+              _nomeField,
+              _estadoIdField,
+              _cidadeIdField,
+              _actionButtons,
             ],
           ),
         ),
@@ -94,47 +93,47 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
 
   // Form Fields
 
-  Widget get nomeField {
+  Widget get _nomeField {
     return FormTextInput(
       label: 'Nome',
-      isDisabled: isViewPage,
-      controller: controllers.nome,
+      isDisabled: _isViewPage,
+      controller: _controllers.nome,
       clear: true,
       isRequired: true,
       validator: (value) => value != '' ? null : 'Campo obrigatório!',
     );
   }
 
-  Widget get estadoIdField {
+  Widget get _estadoIdField {
     return FormSelectInput(
       label: 'UF',
-      isDisabled: isViewPage,
-      controllerValue: controllers.estadoId,
-      controllerLabel: controllers.estadoUf,
+      isDisabled: _isViewPage,
+      controllerValue: _controllers.estadoId,
+      controllerLabel: _controllers.estadoUf,
       isRequired: true,
       itemsCallback: (pattern) async => Provider.of<EstadoRepository>(context, listen: false).select(pattern),
       onSaved: (suggestion) {
         setState(() {
-          controllers.estadoId.text = suggestion['value'] ?? '';
-          controllers.estadoUf.text = suggestion['label'] ?? '';
+          _controllers.estadoId.text = suggestion['value'] ?? '';
+          _controllers.estadoUf.text = suggestion['label'] ?? '';
         });
       },
     );
   }
 
-  Widget get cidadeIdField {
+  Widget get _cidadeIdField {
     return FormSelectInput(
       label: 'Cidade',
-      isDisabled: isViewPage || controllers.estadoId.text == '',
-      controllerValue: controllers.cidadeId,
-      controllerLabel: controllers.cidadeNome,
+      isDisabled: _isViewPage || _controllers.estadoId.text == '',
+      controllerValue: _controllers.cidadeId,
+      controllerLabel: _controllers.cidadeNome,
       isRequired: true,
-      itemsCallback: (pattern) async => Provider.of<CidadeRepository>(context, listen: false).select(pattern, controllers.estadoId.text),
+      itemsCallback: (pattern) async => Provider.of<CidadeRepository>(context, listen: false).select(pattern, _controllers.estadoId.text),
     );
   }
 
-  Widget get actionButtons {
-    return isViewPage
+  Widget get _actionButtons {
+    return _isViewPage
         ? SizedBox.shrink()
         : Row(
             children: [
@@ -153,12 +152,12 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
 
   Future<void> _populateController(Cliente cliente) async {
     setState(() {
-      controllers.id.text = cliente.id ?? '';
-      controllers.nome.text = cliente.nome ?? '';
-      controllers.estadoId.text = cliente.estadoId ?? '';
-      controllers.estadoUf.text = cliente.estadoUf ?? '';
-      controllers.cidadeId.text = cliente.cidadeId ?? '';
-      controllers.cidadeNome.text = cliente.cidadeNome ?? '';
+      _controllers.id.text = cliente.id ?? '';
+      _controllers.nome.text = cliente.nome ?? '';
+      _controllers.estadoId.text = cliente.estadoId ?? '';
+      _controllers.estadoUf.text = cliente.estadoUf ?? '';
+      _controllers.cidadeId.text = cliente.cidadeId ?? '';
+      _controllers.cidadeNome.text = cliente.cidadeNome ?? '';
     });
   }
 
@@ -173,10 +172,10 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
       _formKey.currentState?.save();
 
       final Map<String, String?> payload = {
-        'id': controllers.id.text,
-        'nome': controllers.nome.text,
-        'estadoId': controllers.estadoId.text,
-        'cidadeId': controllers.cidadeId.text,
+        'id': _controllers.id.text,
+        'nome': _controllers.nome.text,
+        'estadoId': _controllers.estadoId.text,
+        'cidadeId': _controllers.cidadeId.text,
       };
 
       await Provider.of<ClienteRepository>(context, listen: false).save(payload).then((validado) {
@@ -185,7 +184,7 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
             context: context,
             builder: (context) {
               return ConfirmActionWidget(
-                message: controllers.id.text == '' ? 'Cliente criado com sucesso!' : 'Cliente atualizada com sucesso!',
+                message: _controllers.id.text == '' ? 'Cliente criado com sucesso!' : 'Cliente atualizada com sucesso!',
                 cancelButtonText: 'Ok',
               );
             },
