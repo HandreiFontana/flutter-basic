@@ -17,7 +17,7 @@ class CidadeListPage extends StatefulWidget {
 class _CidadeListPageState extends State<CidadeListPage> {
   String _query = '';
   late int _page;
-  final int _nextPageTrigger = 3;
+  final int _nextPageTrigger = 10;
   final int _pageSize = 50;
   late bool _isLastPage;
   late bool _hasError;
@@ -96,6 +96,7 @@ class _CidadeListPageState extends State<CidadeListPage> {
                 onSearch: (q) {
                   setState(() {
                     _query = q;
+                    _page = 1;
                     _cards.clear();
                     _fetchData();
                   });
