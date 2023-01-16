@@ -1,6 +1,7 @@
+import 'package:basic/data/repositories/common/cliente_repository.dart';
 import 'package:basic/domain/models/authentication/authentication.dart';
-import 'package:basic/presentation/components/app_confirm_action.dart';
 import 'package:basic/presentation/components/app_list_dismissible_card.dart';
+import 'package:basic/shared/config/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:basic/shared/themes/app_colors.dart';
 import 'package:basic/domain/models/common/cliente.dart';
@@ -16,49 +17,26 @@ class ClienteListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
     Authentication authentication = Provider.of(context, listen: false);
-    final msg = ScaffoldMessenger.of(context);
+
     return AppDismissible(
-      direction: authentication.permitUpdateDelete('/cliente'),
-      endToStart: () {
-        msg.showSnackBar(SnackBar(
-          content: Text('teste'),
-          duration: Duration(seconds: 1),
-        ));
-        showDialog(
-          context: context,
-          builder: (context) {
-            return ConfirmActionWidget(
-              title: 'Sucesso',
-              message: 'Excluido com sucesso',
-              cancelButtonText: 'Fechar',
-            );
-          },
-        );
+      direction: authentication.permitUpdateDelete('/clientes'),
+      endToStart: () async {
+        await Provider.of<ClienteRepository>(context, listen: false).delete(cliente).then((message) {
+          return scaffoldMessenger.showSnackBar(SnackBar(
+            content: Text(message),
+            duration: Duration(seconds: AppConstants.snackBarDuration),
+          ));
+        });
       },
       startToEnd: () {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return ConfirmActionWidget(
-              title: 'Sucesso',
-              message: 'Editado com sucesso',
-              cancelButtonText: 'Fechar',
-            );
-          },
-        );
+        Map data = {'id': cliente.id, 'view': false};
+        Navigator.of(context).pushReplacementNamed('/clientes-form', arguments: data);
       },
       onDoubleTap: () {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return ConfirmActionWidget(
-              title: 'Visualizar',
-              message: '${cliente.nome}\n${cliente.cidadeNome}',
-              cancelButtonText: 'Fechar',
-            );
-          },
-        );
+        Map data = {'id': cliente.id, 'view': true};
+        Navigator.of(context).pushReplacementNamed('/clientes-form', arguments: data);
       },
       body: Column(
         children: <Widget>[

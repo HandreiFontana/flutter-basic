@@ -25,6 +25,7 @@ class _AppScaffoldState extends State<AppScaffold> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: !widget.showDrawer ? BackButton(color: AppColors.background) : null,
         title: widget.title,
         backgroundColor: AppColors.primary,
       ),

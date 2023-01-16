@@ -1,29 +1,35 @@
+import 'package:basic/data/repositories/common/cidade_repository.dart';
+import 'package:basic/data/repositories/common/cliente_repository.dart';
 import 'package:basic/data/repositories/common/estado_repository.dart';
-import 'package:basic/domain/models/common/estado.dart';
+import 'package:basic/domain/models/common/cliente.dart';
 import 'package:basic/presentation/components/app_confirm_action.dart';
 import 'package:basic/presentation/components/app_form_button.dart';
 import 'package:basic/presentation/components/app_scaffold.dart';
+import 'package:basic/presentation/components/inputs/app_form_select_input_widget.dart';
 import 'package:basic/presentation/components/inputs/app_form_text_input_widget.dart';
 import 'package:basic/shared/exceptions/auth_exception.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class EstadoFormPage extends StatefulWidget {
-  const EstadoFormPage({super.key});
+class ClienteFormPage extends StatefulWidget {
+  const ClienteFormPage({super.key});
 
   @override
-  State<EstadoFormPage> createState() => _EstadoFormPageState();
+  State<ClienteFormPage> createState() => _ClienteFormPageState();
 }
 
-class _EstadoFormPageState extends State<EstadoFormPage> {
+class _ClienteFormPageState extends State<ClienteFormPage> {
   final _formKey = GlobalKey<FormState>();
   bool dataIsLoaded = false;
   bool isViewPage = false;
 
-  final controllers = EstadoController(
+  final controllers = ClienteController(
     id: TextEditingController(),
     nome: TextEditingController(),
-    uf: TextEditingController(),
+    estadoId: TextEditingController(),
+    estadoUf: TextEditingController(),
+    cidadeId: TextEditingController(),
+    cidadeNome: TextEditingController(),
   );
 
   // Builder
@@ -42,7 +48,7 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
       onWillPop: () async {
         bool retorno = true;
         isViewPage
-            ? Navigator.of(context).pushNamedAndRemoveUntil('/estados', (route) => false)
+            ? Navigator.of(context).pushNamedAndRemoveUntil('/clientes', (route) => false)
             : await showDialog(
                 context: context,
                 builder: (context) {
@@ -52,12 +58,12 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
                     confirmButtonText: 'Sim',
                   );
                 },
-              ).then((value) => value ? Navigator.of(context).pushNamedAndRemoveUntil('/estados', (route) => false) : retorno = value);
+              ).then((value) => value ? Navigator.of(context).pushNamedAndRemoveUntil('/clientes', (route) => false) : retorno = value);
 
         return retorno;
       },
       child: AppScaffold(
-        title: Text('Estados Form'),
+        title: Text('Clientes Form'),
         showDrawer: false,
         body: formFields(context),
       ),
@@ -75,7 +81,8 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               nomeField,
-              ufField,
+              estadoIdField,
+              cidadeIdField,
               actionButtons,
             ],
           ),
@@ -96,13 +103,31 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
     );
   }
 
-  Widget get ufField {
-    return FormTextInput(
+  Widget get estadoIdField {
+    return FormSelectInput(
       label: 'UF',
       isDisabled: isViewPage,
-      controller: controllers.uf,
+      controllerValue: controllers.estadoId,
+      controllerLabel: controllers.estadoUf,
       isRequired: true,
-      validator: (value) => value != '' ? null : 'Campo obrigatório!',
+      itemsCallback: (pattern) async => Provider.of<EstadoRepository>(context, listen: false).select(pattern),
+      onSaved: (suggestion) {
+        setState(() {
+          controllers.estadoId.text = suggestion['value'] ?? '';
+          controllers.estadoUf.text = suggestion['label'] ?? '';
+        });
+      },
+    );
+  }
+
+  Widget get cidadeIdField {
+    return FormSelectInput(
+      label: 'Cidade',
+      isDisabled: isViewPage || controllers.estadoId.text == '',
+      controllerValue: controllers.cidadeId,
+      controllerLabel: controllers.cidadeNome,
+      isRequired: true,
+      itemsCallback: (pattern) async => Provider.of<CidadeRepository>(context, listen: false).select(pattern, controllers.estadoId.text),
     );
   }
 
@@ -121,14 +146,17 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
   // Functions
 
   Future<void> _loadData(String id) async {
-    await Provider.of<EstadoRepository>(context, listen: false).get(id).then((estado) => _populateController(estado));
+    await Provider.of<ClienteRepository>(context, listen: false).get(id).then((cliente) => _populateController(cliente));
   }
 
-  Future<void> _populateController(Estado estado) async {
+  Future<void> _populateController(Cliente cliente) async {
     setState(() {
-      controllers.id.text = estado.id ?? '';
-      controllers.nome.text = estado.nome ?? '';
-      controllers.uf.text = estado.uf ?? '';
+      controllers.id.text = cliente.id ?? '';
+      controllers.nome.text = cliente.nome ?? '';
+      controllers.estadoId.text = cliente.estadoId ?? '';
+      controllers.estadoUf.text = cliente.estadoUf ?? '';
+      controllers.cidadeId.text = cliente.cidadeId ?? '';
+      controllers.cidadeNome.text = cliente.cidadeNome ?? '';
     });
   }
 
@@ -145,20 +173,21 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
       final Map<String, String?> payload = {
         'id': controllers.id.text,
         'nome': controllers.nome.text,
-        'uf': controllers.uf.text,
+        'estadoId': controllers.estadoId.text,
+        'cidadeId': controllers.cidadeId.text,
       };
 
-      await Provider.of<EstadoRepository>(context, listen: false).save(payload).then((validado) {
+      await Provider.of<ClienteRepository>(context, listen: false).save(payload).then((validado) {
         if (validado) {
           return showDialog(
             context: context,
             builder: (context) {
               return ConfirmActionWidget(
-                message: controllers.id.text == '' ? 'Estado criado com sucesso!' : 'Estado atualizado com sucesso!',
+                message: controllers.id.text == '' ? 'Cliente criado com sucesso!' : 'Cliente atualizada com sucesso!',
                 cancelButtonText: 'Ok',
               );
             },
-          ).then((value) => Navigator.of(context).pushReplacementNamed('/estados'));
+          ).then((value) => Navigator.of(context).pushReplacementNamed('/clientes'));
         }
       });
     } on AuthException catch (error) {
@@ -190,7 +219,7 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
       },
     ).then((value) {
       if (value) {
-        Navigator.of(context).pushReplacementNamed('/estados');
+        Navigator.of(context).pushReplacementNamed('/clientes');
       }
     });
   }

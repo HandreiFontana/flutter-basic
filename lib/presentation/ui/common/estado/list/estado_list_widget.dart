@@ -36,16 +36,8 @@ class EstadoListWidget extends StatelessWidget {
         Navigator.of(context).pushReplacementNamed('/estados-form', arguments: data);
       },
       onDoubleTap: () {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return ConfirmActionWidget(
-              title: 'Visualizar',
-              message: '${estado.nome}\n${estado.uf}',
-              cancelButtonText: 'Fechar',
-            );
-          },
-        );
+        Map data = {'id': estado.id, 'view': true};
+        Navigator.of(context).pushReplacementNamed('/estados-form', arguments: data);
       },
       body: Column(
         children: <Widget>[

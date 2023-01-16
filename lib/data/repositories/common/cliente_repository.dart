@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:basic/shared/exceptions/http_exception.dart';
 import 'package:basic/shared/config/app_constants.dart';
 import 'package:basic/domain/models/common/cliente.dart';
 
@@ -20,6 +19,46 @@ class ClienteRepository with ChangeNotifier {
     this._clientes = const [],
   ]);
 
+  // Save
+
+  Future<bool> save(
+    Map<String, String?> data,
+  ) async {
+    const url = '${AppConstants.apiUrl}/clientes';
+
+    if (data['id'] == '') {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_token',
+        },
+        body: jsonEncode(data),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      }
+
+      return false;
+    }
+
+    final response = await http.put(
+      Uri.parse('$url/${data['id']!}'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $_token',
+      },
+      body: jsonEncode(data),
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    }
+
+    return false;
+  }
+
   // list
 
   Future<Map<String, dynamic>> list(
@@ -30,8 +69,7 @@ class ClienteRepository with ChangeNotifier {
   ) async {
     _clientes.clear();
 
-    final url =
-        '${AppConstants.apiUrl}/clientes?page=$page&pageSize=$rowsPerPage&search=$search';
+    final url = '${AppConstants.apiUrl}/clientes?page=$page&pageSize=$rowsPerPage&search=$search';
 
     final response = await http.get(
       Uri.parse(url),
@@ -57,9 +95,37 @@ class ClienteRepository with ChangeNotifier {
     return data;
   }
 
+  // get
+
+  Future<Cliente> get(String id) async {
+    Cliente cliente = Cliente();
+
+    final url = '${AppConstants.apiUrl}/clientes/$id';
+
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $_token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = jsonDecode(response.body);
+      cliente.id = data['id'];
+      cliente.nome = data['nome'];
+      cliente.estadoId = data['estadoId'];
+      cliente.estadoUf = data['estadoUf'];
+      cliente.cidadeId = data['cidadeId'];
+      cliente.cidadeNome = data['cidadeNome'];
+    }
+
+    return cliente;
+  }
+
   // delete
 
-  Future<void> delete(Cliente cliente) async {
+  Future<String> delete(Cliente cliente) async {
     int index = _clientes.indexWhere((p) => p.id == cliente.id);
 
     if (index >= 0) {
@@ -74,11 +140,13 @@ class ClienteRepository with ChangeNotifier {
       if (response.statusCode >= 400) {
         _clientes.insert(index, cliente);
         notifyListeners();
-        throw HttpException(
-          msg: 'Não foi possível excluir o registro.',
-          statusCode: response.statusCode,
-        );
+
+        return jsonDecode(response.body)['message'];
       }
+
+      return 'Sucesso';
     }
+
+    return 'Item não encontrado';
   }
 }

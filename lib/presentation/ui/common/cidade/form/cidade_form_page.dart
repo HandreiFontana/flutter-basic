@@ -1,29 +1,32 @@
+import 'package:basic/data/repositories/common/cidade_repository.dart';
 import 'package:basic/data/repositories/common/estado_repository.dart';
-import 'package:basic/domain/models/common/estado.dart';
+import 'package:basic/domain/models/common/cidade.dart';
 import 'package:basic/presentation/components/app_confirm_action.dart';
 import 'package:basic/presentation/components/app_form_button.dart';
 import 'package:basic/presentation/components/app_scaffold.dart';
+import 'package:basic/presentation/components/inputs/app_form_select_input_widget.dart';
 import 'package:basic/presentation/components/inputs/app_form_text_input_widget.dart';
 import 'package:basic/shared/exceptions/auth_exception.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class EstadoFormPage extends StatefulWidget {
-  const EstadoFormPage({super.key});
+class CidadeFormPage extends StatefulWidget {
+  const CidadeFormPage({super.key});
 
   @override
-  State<EstadoFormPage> createState() => _EstadoFormPageState();
+  State<CidadeFormPage> createState() => _CidadeFormPageState();
 }
 
-class _EstadoFormPageState extends State<EstadoFormPage> {
+class _CidadeFormPageState extends State<CidadeFormPage> {
   final _formKey = GlobalKey<FormState>();
   bool dataIsLoaded = false;
   bool isViewPage = false;
 
-  final controllers = EstadoController(
+  final controllers = CidadeController(
     id: TextEditingController(),
     nome: TextEditingController(),
-    uf: TextEditingController(),
+    estadoId: TextEditingController(),
+    estadoUf: TextEditingController(),
   );
 
   // Builder
@@ -42,7 +45,7 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
       onWillPop: () async {
         bool retorno = true;
         isViewPage
-            ? Navigator.of(context).pushNamedAndRemoveUntil('/estados', (route) => false)
+            ? Navigator.of(context).pushNamedAndRemoveUntil('/cidades', (route) => false)
             : await showDialog(
                 context: context,
                 builder: (context) {
@@ -52,12 +55,12 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
                     confirmButtonText: 'Sim',
                   );
                 },
-              ).then((value) => value ? Navigator.of(context).pushNamedAndRemoveUntil('/estados', (route) => false) : retorno = value);
+              ).then((value) => value ? Navigator.of(context).pushNamedAndRemoveUntil('/cidades', (route) => false) : retorno = value);
 
         return retorno;
       },
       child: AppScaffold(
-        title: Text('Estados Form'),
+        title: Text('Cidades Form'),
         showDrawer: false,
         body: formFields(context),
       ),
@@ -75,7 +78,7 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               nomeField,
-              ufField,
+              estadoIdField,
               actionButtons,
             ],
           ),
@@ -96,13 +99,14 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
     );
   }
 
-  Widget get ufField {
-    return FormTextInput(
+  Widget get estadoIdField {
+    return FormSelectInput(
       label: 'UF',
       isDisabled: isViewPage,
-      controller: controllers.uf,
+      controllerValue: controllers.estadoId,
+      controllerLabel: controllers.estadoUf,
       isRequired: true,
-      validator: (value) => value != '' ? null : 'Campo obrigatório!',
+      itemsCallback: (pattern) async => Provider.of<EstadoRepository>(context, listen: false).select(pattern),
     );
   }
 
@@ -121,14 +125,15 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
   // Functions
 
   Future<void> _loadData(String id) async {
-    await Provider.of<EstadoRepository>(context, listen: false).get(id).then((estado) => _populateController(estado));
+    await Provider.of<CidadeRepository>(context, listen: false).get(id).then((cidade) => _populateController(cidade));
   }
 
-  Future<void> _populateController(Estado estado) async {
+  Future<void> _populateController(Cidade cidade) async {
     setState(() {
-      controllers.id.text = estado.id ?? '';
-      controllers.nome.text = estado.nome ?? '';
-      controllers.uf.text = estado.uf ?? '';
+      controllers.id.text = cidade.id ?? '';
+      controllers.nome.text = cidade.nome ?? '';
+      controllers.estadoId.text = cidade.estadoId ?? '';
+      controllers.estadoUf.text = cidade.estadoUf ?? '';
     });
   }
 
@@ -145,20 +150,20 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
       final Map<String, String?> payload = {
         'id': controllers.id.text,
         'nome': controllers.nome.text,
-        'uf': controllers.uf.text,
+        'estadoId': controllers.estadoId.text,
       };
 
-      await Provider.of<EstadoRepository>(context, listen: false).save(payload).then((validado) {
+      await Provider.of<CidadeRepository>(context, listen: false).save(payload).then((validado) {
         if (validado) {
           return showDialog(
             context: context,
             builder: (context) {
               return ConfirmActionWidget(
-                message: controllers.id.text == '' ? 'Estado criado com sucesso!' : 'Estado atualizado com sucesso!',
+                message: controllers.id.text == '' ? 'Cidade criada com sucesso!' : 'Cidade atualizada com sucesso!',
                 cancelButtonText: 'Ok',
               );
             },
-          ).then((value) => Navigator.of(context).pushReplacementNamed('/estados'));
+          ).then((value) => Navigator.of(context).pushReplacementNamed('/cidades'));
         }
       });
     } on AuthException catch (error) {
@@ -190,7 +195,7 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
       },
     ).then((value) {
       if (value) {
-        Navigator.of(context).pushReplacementNamed('/estados');
+        Navigator.of(context).pushReplacementNamed('/cidades');
       }
     });
   }
