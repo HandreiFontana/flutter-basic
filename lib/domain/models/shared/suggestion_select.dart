@@ -1,5 +1,3 @@
-// ignore_for_file: file_names
-
 class SuggestionModelSelect {
   String value;
   String label;

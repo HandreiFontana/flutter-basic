@@ -19,10 +19,10 @@ class CidadeFormPage extends StatefulWidget {
 
 class _CidadeFormPageState extends State<CidadeFormPage> {
   final _formKey = GlobalKey<FormState>();
-  bool dataIsLoaded = false;
-  bool isViewPage = false;
+  bool _dataIsLoaded = false;
+  bool _isViewPage = false;
 
-  final controllers = CidadeController(
+  final _controllers = CidadeController(
     id: TextEditingController(),
     nome: TextEditingController(),
     estadoId: TextEditingController(),
@@ -34,17 +34,17 @@ class _CidadeFormPageState extends State<CidadeFormPage> {
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as dynamic;
-    if (args != null && !dataIsLoaded) {
-      controllers.id.text = args['id'] ?? '';
-      _loadData(controllers.id.text);
-      isViewPage = args['view'] ?? false;
-      dataIsLoaded = true;
+    if (args != null && !_dataIsLoaded) {
+      _controllers.id.text = args['id'] ?? '';
+      _loadData(_controllers.id.text);
+      _isViewPage = args['view'] ?? false;
+      _dataIsLoaded = true;
     }
 
     return WillPopScope(
       onWillPop: () async {
         bool retorno = true;
-        isViewPage
+        _isViewPage
             ? Navigator.of(context).pushNamedAndRemoveUntil('/cidades', (route) => false)
             : await showDialog(
                 context: context,
@@ -77,9 +77,9 @@ class _CidadeFormPageState extends State<CidadeFormPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              nomeField,
-              estadoIdField,
-              actionButtons,
+              _nomeField,
+              _estadoIdField,
+              _actionButtons,
             ],
           ),
         ),
@@ -89,29 +89,29 @@ class _CidadeFormPageState extends State<CidadeFormPage> {
 
   // Form Fields
 
-  Widget get nomeField {
+  Widget get _nomeField {
     return FormTextInput(
       label: 'Nome',
-      isDisabled: isViewPage,
-      controller: controllers.nome,
+      isDisabled: _isViewPage,
+      controller: _controllers.nome,
       isRequired: true,
       validator: (value) => value != '' ? null : 'Campo obrigatório!',
     );
   }
 
-  Widget get estadoIdField {
+  Widget get _estadoIdField {
     return FormSelectInput(
       label: 'UF',
-      isDisabled: isViewPage,
-      controllerValue: controllers.estadoId,
-      controllerLabel: controllers.estadoUf,
+      isDisabled: _isViewPage,
+      controllerValue: _controllers.estadoId,
+      controllerLabel: _controllers.estadoUf,
       isRequired: true,
       itemsCallback: (pattern) async => Provider.of<EstadoRepository>(context, listen: false).select(pattern),
     );
   }
 
-  Widget get actionButtons {
-    return isViewPage
+  Widget get _actionButtons {
+    return _isViewPage
         ? SizedBox.shrink()
         : Row(
             children: [
@@ -130,10 +130,10 @@ class _CidadeFormPageState extends State<CidadeFormPage> {
 
   Future<void> _populateController(Cidade cidade) async {
     setState(() {
-      controllers.id.text = cidade.id ?? '';
-      controllers.nome.text = cidade.nome ?? '';
-      controllers.estadoId.text = cidade.estadoId ?? '';
-      controllers.estadoUf.text = cidade.estadoUf ?? '';
+      _controllers.id.text = cidade.id ?? '';
+      _controllers.nome.text = cidade.nome ?? '';
+      _controllers.estadoId.text = cidade.estadoId ?? '';
+      _controllers.estadoUf.text = cidade.estadoUf ?? '';
     });
   }
 
@@ -148,9 +148,9 @@ class _CidadeFormPageState extends State<CidadeFormPage> {
       _formKey.currentState?.save();
 
       final Map<String, String?> payload = {
-        'id': controllers.id.text,
-        'nome': controllers.nome.text,
-        'estadoId': controllers.estadoId.text,
+        'id': _controllers.id.text,
+        'nome': _controllers.nome.text,
+        'estadoId': _controllers.estadoId.text,
       };
 
       await Provider.of<CidadeRepository>(context, listen: false).save(payload).then((validado) {
@@ -159,7 +159,7 @@ class _CidadeFormPageState extends State<CidadeFormPage> {
             context: context,
             builder: (context) {
               return ConfirmActionWidget(
-                message: controllers.id.text == '' ? 'Cidade criada com sucesso!' : 'Cidade atualizada com sucesso!',
+                message: _controllers.id.text == '' ? 'Cidade criada com sucesso!' : 'Cidade atualizada com sucesso!',
                 cancelButtonText: 'Ok',
               );
             },

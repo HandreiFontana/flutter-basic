@@ -17,10 +17,10 @@ class EstadoFormPage extends StatefulWidget {
 
 class _EstadoFormPageState extends State<EstadoFormPage> {
   final _formKey = GlobalKey<FormState>();
-  bool dataIsLoaded = false;
-  bool isViewPage = false;
+  bool _dataIsLoaded = false;
+  bool _isViewPage = false;
 
-  final controllers = EstadoController(
+  final _controllers = EstadoController(
     id: TextEditingController(),
     nome: TextEditingController(),
     uf: TextEditingController(),
@@ -31,17 +31,17 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as dynamic;
-    if (args != null && !dataIsLoaded) {
-      controllers.id.text = args['id'] ?? '';
-      _loadData(controllers.id.text);
-      isViewPage = args['view'] ?? false;
-      dataIsLoaded = true;
+    if (args != null && !_dataIsLoaded) {
+      _controllers.id.text = args['id'] ?? '';
+      _loadData(_controllers.id.text);
+      _isViewPage = args['view'] ?? false;
+      _dataIsLoaded = true;
     }
 
     return WillPopScope(
       onWillPop: () async {
         bool retorno = true;
-        isViewPage
+        _isViewPage
             ? Navigator.of(context).pushNamedAndRemoveUntil('/estados', (route) => false)
             : await showDialog(
                 context: context,
@@ -74,9 +74,9 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              nomeField,
-              ufField,
-              actionButtons,
+              _nomeField,
+              _ufField,
+              _actionButtons,
             ],
           ),
         ),
@@ -86,28 +86,28 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
 
   // Form Fields
 
-  Widget get nomeField {
+  Widget get _nomeField {
     return FormTextInput(
       label: 'Nome',
-      isDisabled: isViewPage,
-      controller: controllers.nome,
+      isDisabled: _isViewPage,
+      controller: _controllers.nome,
       isRequired: true,
       validator: (value) => value != '' ? null : 'Campo obrigatório!',
     );
   }
 
-  Widget get ufField {
+  Widget get _ufField {
     return FormTextInput(
       label: 'UF',
-      isDisabled: isViewPage,
-      controller: controllers.uf,
+      isDisabled: _isViewPage,
+      controller: _controllers.uf,
       isRequired: true,
       validator: (value) => value != '' ? null : 'Campo obrigatório!',
     );
   }
 
-  Widget get actionButtons {
-    return isViewPage
+  Widget get _actionButtons {
+    return _isViewPage
         ? SizedBox.shrink()
         : Row(
             children: [
@@ -126,9 +126,9 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
 
   Future<void> _populateController(Estado estado) async {
     setState(() {
-      controllers.id.text = estado.id ?? '';
-      controllers.nome.text = estado.nome ?? '';
-      controllers.uf.text = estado.uf ?? '';
+      _controllers.id.text = estado.id ?? '';
+      _controllers.nome.text = estado.nome ?? '';
+      _controllers.uf.text = estado.uf ?? '';
     });
   }
 
@@ -143,9 +143,9 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
       _formKey.currentState?.save();
 
       final Map<String, String?> payload = {
-        'id': controllers.id.text,
-        'nome': controllers.nome.text,
-        'uf': controllers.uf.text,
+        'id': _controllers.id.text,
+        'nome': _controllers.nome.text,
+        'uf': _controllers.uf.text,
       };
 
       await Provider.of<EstadoRepository>(context, listen: false).save(payload).then((validado) {
@@ -154,7 +154,7 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
             context: context,
             builder: (context) {
               return ConfirmActionWidget(
-                message: controllers.id.text == '' ? 'Estado criado com sucesso!' : 'Estado atualizado com sucesso!',
+                message: _controllers.id.text == '' ? 'Estado criado com sucesso!' : 'Estado atualizado com sucesso!',
                 cancelButtonText: 'Ok',
               );
             },
