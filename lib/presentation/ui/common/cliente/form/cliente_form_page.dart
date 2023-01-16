@@ -99,6 +99,7 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
       label: 'Nome',
       isDisabled: isViewPage,
       controller: controllers.nome,
+      clear: true,
       isRequired: true,
       validator: (value) => value != '' ? null : 'Campo obrigatório!',
     );

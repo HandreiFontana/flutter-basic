@@ -10,6 +10,7 @@ class FormTextInput extends StatefulWidget {
     required this.label,
     required this.controller,
     this.onSaved,
+    this.clear,
     this.isVisible,
     this.isDisabled,
     this.onChanged,
@@ -24,6 +25,7 @@ class FormTextInput extends StatefulWidget {
   final TextEditingController controller;
   final Function(String value)? onChanged;
   final Function(String? value)? onSaved;
+  final bool? clear;
   final bool? isVisible;
   final bool? isDisabled;
   final bool? isRequired;
@@ -83,10 +85,22 @@ class _FormTextInputState extends State<FormTextInput> {
                 },
                 onSaved: widget.onSaved != null ? (value) => widget.onSaved!(value) : (value) => widget.controller.text = value ?? '',
                 controller: widget.controller,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   isDense: true,
                   contentPadding: EdgeInsets.all(8),
+                  suffixIconConstraints: BoxConstraints(maxHeight: 30),
+                  suffixIcon: widget.clear == true
+                      ? IconButton(
+                          iconSize: 15,
+                          onPressed: () {
+                            setState(() {
+                              widget.controller.text = '';
+                            });
+                          },
+                          icon: Icon(Icons.close),
+                        )
+                      : null,
                 ),
                 inputFormatters: widget.inputFormatters != null ? widget.inputFormatters! : filterTextInputFormatterByType(widget.type),
                 validator: (value) {
