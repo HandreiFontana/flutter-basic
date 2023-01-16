@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:basic/data/repositories/common/user_repository.dart';
 import 'package:basic/data/store.dart';
 import 'package:basic/domain/models/authentication/authentication.dart';
 import 'package:basic/shared/exceptions/auth_exception.dart';
@@ -16,6 +17,7 @@ class AuthenticationPage extends StatefulWidget {
 
 class _AuthenticationPageState extends State<AuthenticationPage> {
   final _formKey = GlobalKey<FormState>();
+  final _formKeySenha = GlobalKey<FormState>();
   // ignore: unused_field
   bool _isLoading = false;
   final _controllerLogin = TextEditingController();
@@ -30,6 +32,94 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
 
   Future<void> salveUserName() async {
     Store.saveString('login', _controllerLogin.text);
+  }
+
+  Future<void> modalConfirmacao(String mensagem) async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Text(mensagem),
+        actions: [
+          ElevatedButton(
+            child: Text("OK"),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> modalAlteraSenha(String token) async {
+    var controllerSenha = TextEditingController();
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Alteração de senha necessária!'),
+        actions: [
+          ElevatedButton(
+            child: Text("OK"),
+            onPressed: () {
+              final isValid = _formKeySenha.currentState?.validate() ?? false;
+              if (isValid) {
+                Provider.of<UserRepository>(context, listen: false).resetaSenha(base64.encode(utf8.encode(controllerSenha.text)), token).then(
+                  (realizado) {
+                    if (realizado) {
+                      modalConfirmacao('Alterado com sucesso! Realize o login novamente').then((value) => Navigator.of(context).pop());
+                    } else {
+                      modalConfirmacao('Algo deu errado na alteração da senha! Tente novamente.');
+                    }
+                  },
+                );
+              }
+            },
+          ),
+        ],
+        content: SingleChildScrollView(
+          child: Form(
+            key: _formKeySenha,
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Text('Digite a nova senha: '),
+                ),
+                TextFormField(
+                  controller: controllerSenha,
+                  obscureText: true,
+                  onSaved: (password) {
+                    _authData['password'] = password ?? '';
+                  },
+                  validator: (password) {
+                    if (password!.isEmpty || password.length < 5) {
+                      return 'Informe uma senha válida';
+                    }
+                    return null;
+                  },
+                ),
+                Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Text('Confirme a senha: '),
+                ),
+                TextFormField(
+                  obscureText: true,
+                  onSaved: (confirmPassword) {
+                    _authData['confirmPassword'] = confirmPassword ?? '';
+                  },
+                  validator: (confirmPassword) {
+                    if (controllerSenha.text != confirmPassword) {
+                      return 'Senhas diferentes!';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   // App bar
@@ -72,8 +162,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
             ),
             keyboardType: TextInputType.emailAddress,
             onSaved: (login) => _authData['login'] = login ?? '',
-            validator: (value) =>
-                (value ?? '').isNotEmpty ? null : 'Campo obrigatório!',
+            validator: (value) => (value ?? '').isNotEmpty ? null : 'Campo obrigatório!',
           ),
         );
       },
@@ -93,8 +182,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
           labelText: 'Senha',
         ),
         obscureText: true,
-        onSaved: (password) =>
-            _authData['password'] = base64.encode(utf8.encode(password ?? '')),
+        onSaved: (password) => _authData['password'] = base64.encode(utf8.encode(password ?? '')),
         validator: (passwordPar) {
           final password = passwordPar ?? '';
           if (password.isEmpty || password.length < 5) {
@@ -155,10 +243,16 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
     try {
       await authentication
           .login(
-            _authData['login']!,
-            _authData['password']!,
-          )
-          .then((value) => Navigator.of(context).pushReplacementNamed('/home'));
+        _authData['login']!,
+        _authData['password']!,
+      )
+          .then((tokenResetSenha) {
+        if (tokenResetSenha != '') {
+          modalAlteraSenha(tokenResetSenha).then((value) => Navigator.of(context).pushReplacementNamed('/'));
+        } else {
+          Navigator.of(context).pushReplacementNamed('/home');
+        }
+      });
     } on AuthException catch (error) {
       _showErrorDialog(error.toString());
     } catch (error) {
@@ -172,11 +266,9 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
         padding: const EdgeInsets.only(top: 15),
         child: ElevatedButton(
           style: ButtonStyle(
-            backgroundColor:
-                MaterialStateProperty.all<Color>(AppColors.primary),
+            backgroundColor: MaterialStateProperty.all<Color>(AppColors.primary),
             padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(20)),
-            foregroundColor:
-                MaterialStateProperty.all<Color>(AppColors.background),
+            foregroundColor: MaterialStateProperty.all<Color>(AppColors.background),
           ),
           onPressed: _submit,
           child: const SizedBox(
@@ -199,13 +291,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            buildFormLogo,
-            buildFormFieldEmail,
-            buildFormFieldPassword,
-            buildElevatedButton(context),
-            buildFormLogoVamilly
-          ],
+          children: [buildFormLogo, buildFormFieldEmail, buildFormFieldPassword, buildElevatedButton(context), buildFormLogoVamilly],
         ),
       ),
     );
