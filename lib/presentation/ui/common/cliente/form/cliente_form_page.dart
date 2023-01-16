@@ -45,7 +45,7 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
     }
 
     return AppScaffold(
-      title: Text('Cidades Form'),
+      title: Text('Clientes Form'),
       showDrawer: true,
       body: formFields(context),
     );
@@ -155,15 +155,16 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
         'id': controllers.id.text,
         'nome': controllers.nome.text,
         'estadoId': controllers.estadoId.text,
+        'cidadeId': controllers.cidadeId.text,
       };
 
-      await Provider.of<CidadeRepository>(context, listen: false).save(payload).then((validado) {
+      await Provider.of<ClienteRepository>(context, listen: false).save(payload).then((validado) {
         if (validado) {
           return showDialog(
             context: context,
             builder: (context) {
               return ConfirmActionWidget(
-                message: controllers.id.text == '' ? 'Cidade criada com sucesso!' : 'Cidade atualizada com sucesso!',
+                message: controllers.id.text == '' ? 'Cliente criado com sucesso!' : 'Cliente atualizada com sucesso!',
                 cancelButtonText: 'Ok',
               );
             },

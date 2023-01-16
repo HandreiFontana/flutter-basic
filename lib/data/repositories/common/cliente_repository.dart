@@ -20,6 +20,46 @@ class ClienteRepository with ChangeNotifier {
     this._clientes = const [],
   ]);
 
+  // Save
+
+  Future<bool> save(
+    Map<String, String?> data,
+  ) async {
+    const url = '${AppConstants.apiUrl}/clientes';
+
+    if (data['id'] == '') {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_token',
+        },
+        body: jsonEncode(data),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      }
+
+      return false;
+    }
+
+    final response = await http.put(
+      Uri.parse('$url/${data['id']!}'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $_token',
+      },
+      body: jsonEncode(data),
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    }
+
+    return false;
+  }
+
   // list
 
   Future<Map<String, dynamic>> list(
@@ -86,7 +126,7 @@ class ClienteRepository with ChangeNotifier {
 
   // delete
 
-  Future<void> delete(Cliente cliente) async {
+  Future<String> delete(Cliente cliente) async {
     int index = _clientes.indexWhere((p) => p.id == cliente.id);
 
     if (index >= 0) {
@@ -101,11 +141,13 @@ class ClienteRepository with ChangeNotifier {
       if (response.statusCode >= 400) {
         _clientes.insert(index, cliente);
         notifyListeners();
-        throw HttpException(
-          msg: 'Não foi possível excluir o registro.',
-          statusCode: response.statusCode,
-        );
+
+        return jsonDecode(response.body)['message'];
       }
+
+      return 'Sucesso';
     }
+
+    return 'Item não encontrado';
   }
 }
