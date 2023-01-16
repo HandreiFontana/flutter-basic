@@ -100,7 +100,6 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
       isDisabled: isViewPage,
       controller: controllers.nome,
       isRequired: true,
-      type: TextInputTypes.date,
       validator: (value) => value != '' ? null : 'Campo obrigatório!',
     );
   }

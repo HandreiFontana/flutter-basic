@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 
 List<TextInputFormatter> filterTextInputFormatterByType(TextInputTypes? type) {
   switch (type) {
-    case TextInputTypes.number:
+    case TextInputTypes.integer:
       return [
         FilteringTextInputFormatter.digitsOnly,
       ];

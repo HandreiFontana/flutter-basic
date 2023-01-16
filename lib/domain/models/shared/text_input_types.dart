@@ -1,4 +1,5 @@
 enum TextInputTypes {
+  integer,
   number,
   cpf,
   cnpj,
