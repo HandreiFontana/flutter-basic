@@ -1,8 +1,6 @@
-import 'package:basic/domain/models/authentication/authentication.dart';
 import 'package:basic/presentation/components/app_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:basic/shared/themes/app_colors.dart';
-import 'package:provider/provider.dart';
 
 class AppScaffold extends StatefulWidget {
   const AppScaffold({
@@ -27,6 +25,7 @@ class _AppScaffoldState extends State<AppScaffold> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: !widget.showDrawer ? BackButton(color: AppColors.background) : null,
         title: widget.title,
         backgroundColor: AppColors.primary,
       ),

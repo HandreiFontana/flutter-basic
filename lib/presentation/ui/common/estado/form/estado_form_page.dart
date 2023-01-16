@@ -38,10 +38,29 @@ class _EstadoFormPageState extends State<EstadoFormPage> {
       dataIsLoaded = true;
     }
 
-    return AppScaffold(
-      title: Text('Estados Form'),
-      showDrawer: true,
-      body: formFields(context),
+    return WillPopScope(
+      onWillPop: () async {
+        bool retorno = true;
+        isViewPage
+            ? Navigator.of(context).pushNamedAndRemoveUntil('/estados', (route) => false)
+            : await showDialog(
+                context: context,
+                builder: (context) {
+                  return ConfirmActionWidget(
+                    message: 'Deseja mesmo sair sem salvar as alterações?',
+                    cancelButtonText: 'Não',
+                    confirmButtonText: 'Sim',
+                  );
+                },
+              ).then((value) => value ? Navigator.of(context).pushNamedAndRemoveUntil('/estados', (route) => false) : retorno = value);
+
+        return retorno;
+      },
+      child: AppScaffold(
+        title: Text('Estados Form'),
+        showDrawer: false,
+        body: formFields(context),
+      ),
     );
   }
 
