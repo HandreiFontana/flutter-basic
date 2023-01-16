@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:basic/domain/models/shared/suggestionSelect.dart';
+import 'package:basic/domain/models/shared/suggestion_select.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:basic/shared/config/app_constants.dart';

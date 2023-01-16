@@ -1,3 +1,5 @@
+import 'package:basic/domain/models/shared/text_input_types.dart';
+import 'package:basic/presentation/components/utils/app_text_input_types.dart';
 import 'package:basic/shared/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +17,7 @@ class FormTextInput extends StatefulWidget {
     this.inputFormatters,
     this.validator,
     this.keyboardType,
+    this.type,
   });
 
   final String label;
@@ -27,6 +30,7 @@ class FormTextInput extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
   final Function(String val)? validator;
   final TextInputType? keyboardType;
+  final TextInputTypes? type;
 
   @override
   State<FormTextInput> createState() => _FormTextInputState();
@@ -84,7 +88,7 @@ class _FormTextInputState extends State<FormTextInput> {
                   isDense: true,
                   contentPadding: EdgeInsets.all(8),
                 ),
-                inputFormatters: widget.inputFormatters,
+                inputFormatters: widget.inputFormatters != null ? widget.inputFormatters! : filterTextInputFormatterByType(widget.type),
                 validator: (value) {
                   if (widget.validator != null) {
                     return widget.validator!(value ?? '');
