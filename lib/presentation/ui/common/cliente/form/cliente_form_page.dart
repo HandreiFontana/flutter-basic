@@ -2,6 +2,7 @@ import 'package:basic/data/repositories/common/cidade_repository.dart';
 import 'package:basic/data/repositories/common/cliente_repository.dart';
 import 'package:basic/data/repositories/common/estado_repository.dart';
 import 'package:basic/domain/models/common/cliente.dart';
+import 'package:basic/domain/models/shared/text_input_types.dart';
 import 'package:basic/presentation/components/app_confirm_action.dart';
 import 'package:basic/presentation/components/app_form_button.dart';
 import 'package:basic/presentation/components/app_scaffold.dart';
@@ -99,6 +100,7 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
       isDisabled: isViewPage,
       controller: controllers.nome,
       isRequired: true,
+      type: TextInputTypes.date,
       validator: (value) => value != '' ? null : 'Campo obrigatório!',
     );
   }
