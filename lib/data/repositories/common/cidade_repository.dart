@@ -62,7 +62,7 @@ class CidadeRepository with ChangeNotifier {
 
   // list
 
-  Future<Map<String, dynamic>> list(
+  Future<List<Cidade>> list(
     String? search,
     int? rowsPerPage,
     int? page,
@@ -82,21 +82,59 @@ class CidadeRepository with ChangeNotifier {
 
     Map<String, dynamic> data = jsonDecode(response.body);
 
-    data['items'].forEach((cidadeData) {
-      _cidades.add(
-        Cidade(
-          id: cidadeData['id'],
-          nome: cidadeData['nome'],
-          estadoId: cidadeData['estadoId'],
-          estadoUf: cidadeData['estadoUf'],
-        ),
-      );
-    });
+    List dataList = data['items'];
+
+    List<Cidade> cidadeList = dataList
+        .map(
+          (e) => Cidade(
+            id: e['id'],
+            nome: e['nome'],
+            estadoId: e['estadoId'],
+            estadoUf: e['estadoUf'],
+          ),
+        )
+        .toList();
 
     notifyListeners();
 
-    return data;
+    return cidadeList;
   }
+
+  // Future<Map<String, dynamic>> list(
+  //   String? search,
+  //   int? rowsPerPage,
+  //   int? page,
+  //   List? columnOrder,
+  // ) async {
+  //   _cidades.clear();
+
+  //   final url = '${AppConstants.apiUrl}/cidades?page=$page&pageSize=$rowsPerPage&search=$search';
+
+  //   final response = await http.get(
+  //     Uri.parse(url),
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       'Authorization': 'Bearer $_token',
+  //     },
+  //   );
+
+  //   Map<String, dynamic> data = jsonDecode(response.body);
+
+  //   data['items'].forEach((cidadeData) {
+  //     _cidades.add(
+  //       Cidade(
+  //         id: cidadeData['id'],
+  //         nome: cidadeData['nome'],
+  //         estadoId: cidadeData['estadoId'],
+  //         estadoUf: cidadeData['estadoUf'],
+  //       ),
+  //     );
+  //   });
+
+  //   notifyListeners();
+
+  //   return data;
+  // }
 
   // get
 
